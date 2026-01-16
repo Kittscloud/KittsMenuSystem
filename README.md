@@ -2,7 +2,7 @@
 *LabAPI Server-Specific Menu Framework*
 
 [![License](https://img.shields.io/badge/License-LGPL%20v2.1-blue?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/blob/main/LICENSE)
-[![Downloads](https://img.shields.io/github/downloads/Kittscloud/KittsMenuSystem/total?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/Kittscloud/KittsMenuSystem/total?style=for-the-badge)](https://github.com/Kittscloud/ServerSpecificsSyncer/releases/latest)
 [![GitHub release](https://img.shields.io/github/v/release/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/releases/latest)
 [![](https://img.shields.io/badge/.NET-4.8.1-512BD4?logo=dotnet&logoColor=fff&style=for-the-badge)](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net481)
 [![GitHub stars](https://img.shields.io/github/stars/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/stargazers)
