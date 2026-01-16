@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- Project Definitions -->
+    <PropertyGroup>
+        <TargetFramework>net481</TargetFramework>
+
+        <OutputType>Library</OutputType>
+        <RootNamespace>KittsMenuSystem</RootNamespace>
+        <AssemblyName>KittsMenuSystem</AssemblyName>
+
+        <LangVersion>latest</LangVersion>
+        <PlatformTarget>x64</PlatformTarget>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Platforms>x64</Platforms>
+		
+		<NoWarn>1591</NoWarn>
+    </PropertyGroup>
+
+    <!-- Debug | x64 -->
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+
+    <!-- Release | x64 -->
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+	
+	<!-- NuGet Packages -->
+    <ItemGroup>
+      <PackageReference Include="Northwood.LabAPI" Version="1.1.5" />
+      <PackageReference Include="PolySharp" Version="1.15.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+
+    <!-- References -->
+    <ItemGroup>
+        <Reference Include="0Harmony">
+            <HintPath>..\..\Dependencies\0Harmony.dll</HintPath>
+        </Reference>
+		
+        <Reference Include="Assembly-CSharp-firstpass">
+            <HintPath>..\..\Local Admin Server\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+        </Reference>
+
+        <Reference Include="Assembly-CSharp-Publicized">
+            <HintPath>..\..\Local Admin Server\SCPSL_Data\Managed\Assembly-CSharp-Publicized.dll</HintPath>
+        </Reference>
+
+        <Reference Include="Mirror-Publicized">
+            <HintPath>..\..\Local Admin Server\SCPSL_Data\Managed\Mirror-Publicized.dll</HintPath>
+        </Reference>
+
+        <Reference Include="NorthwoodLib">
+            <HintPath>..\..\Local Admin Server\SCPSL_Data\Managed\NorthwoodLib.dll</HintPath>
+        </Reference>
+
+        <Reference Include="System" />
+        <Reference Include="System.Core" />
+        <Reference Include="System.Data" />
+        <Reference Include="System.Xml" />
+
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>..\..\Local Admin Server\SCPSL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>..\..\Local Admin Server\SCPSL_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+</Project>
