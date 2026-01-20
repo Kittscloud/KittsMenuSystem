@@ -1,12 +1,12 @@
-using KittsMenuSystem.Features;
+using KittsMenuSystem.Features.Menus;
 using KittsMenuSystem.Features.Wrappers;
-using UserSettings.ServerSpecific;
+using System.Collections.Generic;
 
 namespace KittsMenuSystem.Examples;
 
 internal class MainExample : Menu
 {
-    public override ServerSpecificSettingBase[] Settings => [
+    public override List<BaseSetting> Settings(ReferenceHub hub) => [
         new TextArea("Hello! Welcome to the exmaples.\nDemo Exmaple - Contains all settings you can use\nTextArea Exmaple - Shows you how you can use text areas\n" +
             "Utitly Exmaple - This contains a whole bunch of exmaples of how you can actualy utilize things this framework has to offer, but please " +
             "do remember, this is not all you can do with this framework, honestly, the possibilities is almost unlimited, only limited to what the framework " +
@@ -17,5 +17,5 @@ internal class MainExample : Menu
     ];
 
     public override string Name { get; set; } = "Main Exmaple Menu";
-    public override int Id { get; set; } = -200987;
+    public override int Id { get; set; } = -2427;
 }

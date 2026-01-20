@@ -1,5 +1,4 @@
-﻿using KittsMenuSystem.Features.Wrappers;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace KittsMenuSystem;
 
@@ -9,7 +8,7 @@ namespace KittsMenuSystem;
 public class Config
 {
     /// <summary>
-    /// Is the plugin enabled.
+    /// Is plugin enabled.
     /// </summary>
     [Description("Is plugin enabled")]
     public bool IsEnabled { get; set; } = true;
@@ -19,12 +18,6 @@ public class Config
     /// </summary>
     [Description("Sends debug logs to console")]
     public bool Debug { get; set; } = false;
-
-    /// <summary>
-    /// Allows pins (pins are seen on all menus).
-    /// </summary>
-    [Description("Allows pins (pins are seen on all menus).")]
-    public bool AllowPinnedContent { get; set; } = true;
 
     /// <summary>
     /// Allows players to see errors.
@@ -45,22 +38,10 @@ public class Config
     public bool ShowFullErrorToModerators { get; set; } = true;
 
     /// <summary>
-    /// If only one menu registered and false, menu opens automatically.
-    /// </summary>
-    [Description("If only one menu registered and false, menu opens automatically.")]
-    public bool ForceMainMenuEvenIfOnlyOne { get; set; }
-
-    /// <summary>
     /// Whether example menus in-built to the plugin are enabled.
     /// </summary>
     [Description("Whether example menus in-built to the plugin are enabled.")]
     public bool EnableExamples { get; set; } = true;
-
-    /// <summary>
-    /// Makes the compatibility system register all menus in other plugins that use KittsMenuSystem.
-    /// </summary>
-    [Description("Whether the compatibility system will register all menus in other plugins that use KittsMenuSystem.")]
-    public bool CompatibilityEnabled { get; set; } = true;
 
     /// <summary>
     /// Plugin translation labels and buttons.
@@ -78,12 +59,6 @@ public class Translation
     /// </summary>
     [Description("Main menu button opening menu. {0} = menu name.")]
     public ButtonConfig OpenMenu { get; set; } = new("Open {0}", "Open");
-
-    /// <summary>
-    /// Button shown when menu is open.
-    /// </summary>
-    [Description("Button shown when menu open.")]
-    public ButtonConfig ReturnToMenu { get; set; } = new("Return to menu", "Return");
 
     /// <summary>
     /// Button shown in sub-menu returning to parent. {0} = menu name.

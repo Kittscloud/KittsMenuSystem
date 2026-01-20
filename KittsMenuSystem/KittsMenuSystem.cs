@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using KittsMenuSystem.Features;
-using KittsMenuSystem.Features.Wrappers;
+using KittsMenuSystem.Features.Menus;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features;
 using LabApi.Loader;
@@ -18,10 +18,10 @@ public class KittsMenuSystem : Plugin
 
     public override string Name { get; } = "KittsMenuSystem";
     public override string Author { get; } = "Kittscloud";
-    public override string Description { get; } = "Kitts Menu System";
+    public override string Description { get; } = "";
     public override LoadPriority Priority { get; } = LoadPriority.Lowest;
 
-    public override Version Version { get; } = new Version(0, 1, 0);
+    public override Version Version { get; } = new Version(0, 2, 0);
     public override Version RequiredApiVersion { get; } = new Version(LabApiProperties.CompiledVersion);
 
     public static Config Config { get; set; }
@@ -40,7 +40,7 @@ public class KittsMenuSystem : Plugin
         if (!Config.IsEnabled)
             return;
 
-        MenuManager.RegisterAll();
+        MenuManager.RegisterAllMenus();
 
         Instance = this;
 
@@ -61,7 +61,7 @@ public class KittsMenuSystem : Plugin
     {
         this.SaveConfig(Config, "config.yml");
 
-        MenuManager.UnregisterAll();
+        MenuManager.UnregisterAllMenus();
 
         CustomHandlersManager.UnregisterEventsHandler(_handler);
 
@@ -77,7 +77,6 @@ public class KittsMenuSystem : Plugin
         Log.Info($"Successfully Disabled {Name}@{Version}");
     }
 
-    /// <inheritdoc/>
     public override void LoadConfigs()
     {
         _errorLoadingConfig = !this.TryLoadConfig("config.yml", out Config config);

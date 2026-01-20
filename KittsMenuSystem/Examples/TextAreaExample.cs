@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
-using PlayerRoles;
-using PlayerRoles.FirstPersonControl;
-using KittsMenuSystem.Features;
 using KittsMenuSystem.Features.Wrappers;
-using UnityEngine;
 using UserSettings.ServerSpecific;
+using KittsMenuSystem.Features.Menus;
 
 namespace KittsMenuSystem.Examples;
 
 internal class TextAreaExample : Menu
 {
     // Exmaple to show what you can do with TextAreas, pretty much anything
-    public override ServerSpecificSettingBase[] Settings =>
+    public override List<BaseSetting> Settings(ReferenceHub hub) =>
     [
         new GroupHeader("Different Text Area Types"),
         new TextArea("<color=#00FFFF>This</color> <size=30>text</size> <color=red>area</color> <u>supports</u> <i>Rich</i> <b>Text</b> <rotate=\"25\">Tags</rotate>."),
@@ -24,5 +21,5 @@ internal class TextAreaExample : Menu
 
     public override string Name { get; set; } = "Text Area Example";
     public override int Id { get; set; } = -7;
-    public override Type MenuRelated { get; set; } = typeof(MainExample);
+    public override Type ParentMenu { get; set; } = typeof(MainExample);
 }

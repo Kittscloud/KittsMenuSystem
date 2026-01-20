@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KittsMenuSystem;
+namespace KittsMenuSystem.Features;
 
 internal class Log
 {

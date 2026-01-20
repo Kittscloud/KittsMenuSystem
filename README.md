@@ -1,12 +1,12 @@
 # KittsMenuSystem
 *LabAPI Server-Specific Menu Framework*
 
-![License](https://img.shields.io/badge/License-LGPL%20v2.1-blue?style=for-the-badge)
-![GitHub all releases](https://img.shields.io/github/downloads/Kittscloud/KittsMenuSystem/total?style=for-the-badge)
-![GitHub release](https://img.shields.io/github/v/release/Kittscloud/KittsMenuSystem?style=for-the-badge)
-![](https://img.shields.io/badge/.NET-4.8.1-512BD4?logo=dotnet&logoColor=fff&style=for-the-badge)
-![GitHub stars](https://img.shields.io/github/stars/Kittscloud/KittsMenuSystem?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/Kittscloud/KittsMenuSystem?style=for-the-badge)
+[![License](https://img.shields.io/badge/License-AGPL%20v3.0-blue?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/Kittscloud/KittsMenuSystem/total?style=for-the-badge)](https://github.com/Kittscloud/ServerSpecificsSyncer/releases/latest)
+[![GitHub release](https://img.shields.io/github/v/release/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/releases/latest)
+[![](https://img.shields.io/badge/.NET-4.8.1-512BD4?logo=dotnet&logoColor=fff&style=for-the-badge)](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net481)
+[![GitHub stars](https://img.shields.io/github/stars/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/issues)
 
 `KittsMenuSystem` is a framework that adds a complete ServerSpecific menu system for `SCP Secret Laboratory` using `LabAPI`.
 
@@ -122,7 +122,7 @@ Create a new class inheriting the `Menu` class
 ```csharp
 public class Test : Menu
 {
-    public override ServerSpecificSettingBase[] Settings => [
+    public override List<BaseSetting> Settings(ReferenceHub hub) => [
         // Settings in here.
     ];
 

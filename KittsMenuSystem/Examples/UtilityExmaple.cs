@@ -1,21 +1,15 @@
 ﻿using CustomPlayerEffects;
-using GameCore;
-using InventorySystem;
-using InventorySystem.Items;
-using KittsMenuSystem.Features;
+using KittsMenuSystem.Features.Menus;
 using KittsMenuSystem.Features.Wrappers;
 using LabApi.Features.Wrappers;
 using Mirror;
 using PlayerRoles;
-using PlayerRoles.FirstPersonControl;
 using PlayerStatsSystem;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using UserSettings.ServerSpecific;
-using UserSettings.ServerSpecific.Examples;
 using static UserSettings.ServerSpecific.Examples.SSLightSpawnerExample;
 
 namespace KittsMenuSystem.Examples;
@@ -24,18 +18,16 @@ internal class UtilityExmaple : Menu
 {
     private static readonly HashSet<ReferenceHub> _activeSpeedBoosts = [];
 
-    private readonly List<ServerSpecificSettingBase> _addedSettings = [];
+    private readonly List<BaseSetting> _addedSettings = [];
     private List<ColorPreset> _presets;
     private LightShadows[] _shadowsType;
     private LightType[] _lightType;
-    private SSTextArea _selectedColorTextArea;
+    private TextArea _selectedColorTextArea;
     private readonly List<LightSourceToy> _spawnedToys = [];
 
-    public override ServerSpecificSettingBase[] Settings => GetSettings();
-
-    public ServerSpecificSettingBase[] GetSettings()
+    public override List<BaseSetting> Settings(ReferenceHub hub)
     {
-        List<ServerSpecificSettingBase> _settings = [];
+        List<BaseSetting> settings = [];
 
         // Init Light Spawner Lists
         _presets ??=
@@ -52,36 +44,44 @@ internal class UtilityExmaple : Menu
         ];
         _shadowsType ??= EnumUtils<LightShadows>.Values;
         _lightType ??= EnumUtils<LightType>.Values;
-        _selectedColorTextArea ??= new SSTextArea(5, "Selected Color: None");
+        _selectedColorTextArea ??= new TextArea(5, "Selected Color: None");
 
-        _settings = [
-            new GroupHeader("Abilities"),
-            // Note that for a keybind to work and be registered, the player must open the menu that the keybind is on
-            new Keybind("Speed Boost (Human-only)", (hub, isPressed, _) =>
+        settings = [
+            // It's always good to have your own button at the top of all menus to reload menus
+            // As this will update things that don't get auto updated, such as text areas
+            new Button("Reload Menu", "Reload", (h, _) => ReloadFor(h)),
+
+            //new GroupHeader("Abilities"),
+            new Keybind("Speed Boost (Human-only)", (h, isPressed, _) =>
             {
-                bool toggleMode = hub.GetParameter<UtilityExmaple, SSTwoButtonsSetting>(1).SyncIsB;
+                bool toggleMode = h.GetSetting<UtilityExmaple, SSTwoButtonsSetting>(1).SyncIsB;
 
                 if (toggleMode)
                 {
                     if (!isPressed) return;
-                    SetSpeedBoost(hub, !_activeSpeedBoosts.Contains(hub));
+                    SetSpeedBoost(h, !_activeSpeedBoosts.Contains(h));
                 }
                 else
-                    SetSpeedBoost(hub, isPressed);
+                    SetSpeedBoost(h, isPressed);
             }, KeyCode.Y, hint: "Increase your speed by draining your health."),
-            new YesNoButton(1, "Speed Boost - Activation Mode", "Hold", "Toggle"),
+            new ABButton(1, "Speed Boost - Activation Mode", "Hold", "Toggle"),
 
-            // Settings do not have to have IDs, you only need IDs if you are trying to use GetParameter
+            // Settings do not need IDs, you only need IDs if you are trying to use GetSetting
+            // However two settings without Ids cannot be of the same type and have the same label
+            // NOTE: Setting IDs makes it easier when debugging, but again, aren't needed
             new GroupHeader("Death"),
-            new Button("Kill Yourself", "Click Me", (hub, _) => hub.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Unknown))),
-            new Button("Kill Yourself with Hold Time", "Hold Me", (hub, _) => hub.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Unknown)), holdTimeSeconds: 1f),
-            new Keybind("Kill Yourself Keybind", (hub, isPressed, _) => { if (isPressed) hub.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Unknown)); }),
+            new Button("Kill Yourself", "Click Me", (h, _) => hub.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Unknown))),
+            new Button("Kill Yourself with Hold Time", "Hold Me", (h, _) => h.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Unknown)), holdTimeSeconds: 1f),
+            new Keybind("Kill Yourself Keybind", (h, isPressed, _) => { if (isPressed) h.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Unknown)); }),
             
+            // You can also use the hub parameter from the GetSetting function to display specific things to that hub, or have defaults
+            // For exmaple, you can put the players name as a placeholder so its not empty when first going in the menu
             new GroupHeader("Name Change"),
-            new Plaintext("Name", (hub, newName, _) => {
-                Player.Dictionary.TryGetValue(hub, out Player value);
-                value.DisplayName = newName;
-            }),
+            new TextBox("Name", (h, newName, _) => h.nicknameSync.DisplayName = newName, hub.nicknameSync.DisplayName),
+
+            // You can do anything with this hub, display it's information, get the Player object, anything
+            new GroupHeader("About Hub"),
+            new TextArea($"Display Name: {hub.nicknameSync.DisplayName}\nNetId: {hub.netId}\nPlayerId: {hub.PlayerId}\nRole Name: {hub.roleManager.CurrentRole.RoleName}\nAnd so on"),
 
             // This section shows you how you can use all sorts of settings and features together to make one whole feature of your own
             new GroupHeader("Spawning Light Source"),
@@ -96,9 +96,9 @@ internal class UtilityExmaple : Menu
         ];
 
         // You can also add another list that can be updated whenever, such as when adding destroy buttons for spawning lights
-        _settings.AddRange(_addedSettings);
+        settings.AddRange(_addedSettings);
 
-        return [.. _settings.Where(s => s != null)];
+        return [.. settings.Where(s => s != null)];
     }
 
     private void SetSpeedBoost(ReferenceHub hub, bool enable)
@@ -118,9 +118,9 @@ internal class UtilityExmaple : Menu
         }
     }
 
-    private void ReloadColorInfoForUser(ReferenceHub hub) => _selectedColorTextArea.SendTextUpdate(GetColorInfoForUser(hub), receiveFilter: (h) => h == hub);
+    private void ReloadColorInfoForUser(ReferenceHub hub) => (_selectedColorTextArea.Base as SSTextArea).SendTextUpdate(GetColorInfoForUser(hub), receiveFilter: (h) => h == hub);
     public string GetColorInfoForUser(ReferenceHub hub) => "Selected color: <color=" + this.GetColorInfo(hub).ToHex() + ">███████████</color>";
-    private Color GetColorInfo(ReferenceHub hub) => _presets[hub.GetParameter<UtilityExmaple, SSDropdownSetting>(4).SyncSelectionIndexRaw].Color;
+    private Color GetColorInfo(ReferenceHub hub) => _presets[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(4).SyncSelectionIndexRaw].Color;
 
     private void Spawn(ReferenceHub hub)
     {
@@ -128,12 +128,12 @@ internal class UtilityExmaple : Menu
         if (toy == null)
             return;
 
-        toy.Intensity = hub.GetParameter<UtilityExmaple, SSSliderSetting>(2).SyncFloatValue;
-        toy.Range = hub.GetParameter<UtilityExmaple, SSSliderSetting>(3).SyncFloatValue;
+        toy.Intensity = hub.GetSetting<UtilityExmaple, SSSliderSetting>(2).SyncFloatValue;
+        toy.Range = hub.GetSetting<UtilityExmaple, SSSliderSetting>(3).SyncFloatValue;
         toy.Color = GetColorInfo(hub);
-        toy.ShadowType = _shadowsType[hub.GetParameter<UtilityExmaple, SSDropdownSetting>(6).SyncSelectionIndexRaw];
-        toy.ShadowStrength = hub.GetParameter<UtilityExmaple, SSSliderSetting>(7).SyncFloatValue;
-        toy.Type = _lightType[hub.GetParameter<UtilityExmaple, SSDropdownSetting>(8).SyncSelectionIndexRaw];
+        toy.ShadowType = _shadowsType[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(6).SyncSelectionIndexRaw];
+        toy.ShadowStrength = hub.GetSetting<UtilityExmaple, SSSliderSetting>(7).SyncFloatValue;
+        toy.Type = _lightType[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(8).SyncSelectionIndexRaw];
         toy.Transform.position = hub.transform.position;
 
         _spawnedToys.Add(toy);
@@ -151,12 +151,12 @@ internal class UtilityExmaple : Menu
             return;
 
         _addedSettings.Add(new GroupHeader("Spawned Lights"));
-        _addedSettings.Add(new Button(9, "All Lights", "Destroy All (HOLD)", null, 2f));
+        _addedSettings.Add(new Button(9, "All Lights", "Destroy All (HOLD)", (_, _) => DestroyAll(), 2f));
 
         foreach (LightSourceToy toy in _spawnedToys)
         {
             int id = (int)toy.Base.netId;
-            _addedSettings.Add(new Button(id, $"Light #{id}", "Destroy (HOLD)", null, 0.4f));
+            _addedSettings.Add(new Button(id, $"Light #{id}", "Destroy (HOLD)", (_, setting) => Destroy(setting.SettingId), 0.4f));
         }
     }
 
@@ -174,17 +174,6 @@ internal class UtilityExmaple : Menu
     {
         if (!userHub.IsHuman())
             SetSpeedBoost(userHub, false);
-    }
-
-    // You also don't have to use the Actions in the Settings, you can use this override and check if IDs match and then run code, as seen below
-    public override void OnInput(ReferenceHub hub, ServerSpecificSettingBase setting)
-    {
-        if (setting.SettingId > 10)
-            Destroy(setting.SettingId);
-        if (setting.SettingId == 9)
-            DestroyAll();
-
-        base.OnInput(hub, setting);
     }
 
     private void DestroyAll()
@@ -215,5 +204,5 @@ internal class UtilityExmaple : Menu
 
     public override string Name { get; set; } = "Utility Exmaple";
     public override int Id { get; set; } = -8;
-    public override Type MenuRelated { get; set; } = typeof(MainExample);
+    public override Type ParentMenu { get; set; } = typeof(MainExample);
 }
