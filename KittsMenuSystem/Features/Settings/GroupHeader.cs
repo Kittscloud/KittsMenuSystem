@@ -1,6 +1,6 @@
 using UserSettings.ServerSpecific;
 
-namespace KittsMenuSystem.Features.Wrappers;
+namespace KittsMenuSystem.Features.Settings;
 
 /// <summary>
 /// Initialize new <see cref="GroupHeader"/> setting with base <see cref="SSGroupHeader"/>.

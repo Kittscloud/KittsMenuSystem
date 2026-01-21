@@ -1,6 +1,6 @@
 ﻿using CustomPlayerEffects;
 using KittsMenuSystem.Features.Menus;
-using KittsMenuSystem.Features.Wrappers;
+using KittsMenuSystem.Features.Settings;
 using LabApi.Features.Wrappers;
 using Mirror;
 using PlayerRoles;

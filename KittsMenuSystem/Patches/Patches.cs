@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using KittsMenuSystem.Features;
 using KittsMenuSystem.Features.Menus;
-using KittsMenuSystem.Features.Wrappers;
+using KittsMenuSystem.Features.Settings;
 using Mirror;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,6 @@ internal static class CompatibilityPatch
 
     private static void Load(ServerSpecificSettingBase[] settings)
     {
-        Log.Error("Load");
         Assembly assembly = Assembly.GetCallingAssembly();
 
         if (assembly == typeof(ReferenceHub).Assembly || LockedAssembly.Contains(assembly))
@@ -106,7 +105,6 @@ internal static class CompatibilityPatch
     [HarmonyPrefix]
     private static bool SendToPlayer(ReferenceHub hub, ServerSpecificSettingBase[] collection, int? versionOverride = null)
     {
-        Log.Error("Prevalidate HUB Cllention");
         Assembly asm = Assembly.GetCallingAssembly();
         AssemblyMenu menu = MenuManager.GetMenu(asm);
 

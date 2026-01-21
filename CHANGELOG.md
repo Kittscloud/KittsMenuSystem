@@ -1,5 +1,11 @@
 # KittsMenuSystem Changelog
 
+## Version 0.3.0
+- Added `KeybindMenu` - Used to load all keybinds when player not in settings.
+- Added `OnStatusReceived` function - Updated the settings to and from `KeybindMenu` when player not in settings.
+- Updated `KittsMenuSystem.Features.Wrappers` namespace - Now named `KittsMenuSystem.Features.Settings`.
+- Removed `All Keybinds` on all `Menus` - No longer needed due to `KeybindMenu`. 
+
 ## Version 0.2.0
 - Added `AccessExmaple.cs` - Exmaple menu where you don't have access (literally pointless).
 - Added `BaseSetting` - All `Wrappers` now use `BaseSetting` instead of `ServerSpecificSettingBase` and all functions have been updated to work with `BaseSetting`.
@@ -18,8 +24,9 @@
 - Updated `ProperlyEnable` fucntion - Now named `OnOpen`
 - Updated `ProperlyDisable` fucntion - Now named `OnClose`
 - Updated `GetParamter` function - Now named `GetSetting`
-- Updated `MenuSync` - Now named `SyncedMenus`.
-- Updated `LoadedMenus` - Now named `RegisteredMenus`.
+- Updated `MenuSync` - Now named `SyncedMenus` and can no longer be mutated.
+- Updated `LoadedMenus` - Now named `RegisteredMenus` and can no longer be mutated.
+- Updated `Pinned` - Can no longer be mutated.
 - Updated `RegisterAll` function - Now named `RegisterAllMenus`.
 - Updated `UnregisterAll` function - Now named `UnregisterAllMenus`.
 - Updated `Register` function - Now `internal`.

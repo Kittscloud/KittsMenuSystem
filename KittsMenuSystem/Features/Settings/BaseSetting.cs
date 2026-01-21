@@ -1,7 +1,7 @@
 ﻿using System;
 using UserSettings.ServerSpecific;
 
-namespace KittsMenuSystem.Features.Wrappers;
+namespace KittsMenuSystem.Features.Settings;
 
 public abstract class BaseSetting(ServerSpecificSettingBase @base)
 {

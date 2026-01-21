@@ -2,7 +2,7 @@ using Mirror;
 using System;
 using UserSettings.ServerSpecific;
 
-namespace KittsMenuSystem.Features.Wrappers;
+namespace KittsMenuSystem.Features.Settings;
 
 /// <summary>
 /// Initialize new <see cref="Button"/> setting with base <see cref="SSButton"/> that calls <see cref="Action"/> when pressed.

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using KittsMenuSystem.Features.Wrappers;
+using KittsMenuSystem.Features.Settings;
 using UserSettings.ServerSpecific;
 using KittsMenuSystem.Features.Menus;
 

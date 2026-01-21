@@ -1,5 +1,5 @@
 using KittsMenuSystem.Features.Menus;
-using KittsMenuSystem.Features.Wrappers;
+using KittsMenuSystem.Features.Settings;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.CustomHandlers;
 using MEC;
@@ -35,20 +35,20 @@ internal class EventHandler : CustomEventsHandler
                 return;
             }
 
-            Menu menu = hub.GetCurrentMenu();
+			Menu menu = hub.GetCurrentMenu();
 
-            // Find the sent setting to act on
-            menu.BuiltSettings.TryGetValue(hub, out List<BaseSetting> builtSettings);
-            BaseSetting target = builtSettings?.FirstOrDefault(b => b.SettingId == ss.SettingId)
-                ?? throw new Exception("Failed to find the sent setting for the hub.");
+			// Find the sent setting to act on
+			menu.BuiltSettings.TryGetValue(hub, out List<BaseSetting> builtSettings);
+			BaseSetting target = builtSettings?.FirstOrDefault(b => b.SettingId == ss.SettingId)
+				?? throw new ArgumentNullException("Failed to find the sent setting for the hub.");
 
-            Log.Debug("EventHandler.OnSettingReceived", $"Target setting found: {target.SettingId} ({target.GetType().Name})");
+			Log.Debug("EventHandler.OnSettingReceived", $"Target setting found: {target.SettingId} ({target.GetType().Name})");
 
-            // Sync setting
-            target.Base = ss;
+			// Sync setting
+			target.Base = ss;
 
-            // Invoke action depending on type
-            switch (target)
+			// Invoke action depending on type
+			switch (target)
             {
                 case Button btn when ss is SSButton ssBtn && ssBtn.SyncLastPress.ElapsedMilliseconds == 0L: btn.OnPressed?.Invoke(hub, ssBtn); break;
                 case Dropdown dd when ss is SSDropdownSetting ssDd: dd.OnChanged?.Invoke(hub, ssDd.SyncSelectionIndexRaw, ssDd); break;
@@ -73,6 +73,35 @@ internal class EventHandler : CustomEventsHandler
                     new Button(KittsMenuSystem.Config.Translation.ReloadButton.Label, KittsMenuSystem.Config.Translation.ReloadButton.ButtonText, (h, _) => h.LoadMenu(null))
                 ]);
             }
+        }
+    }
+
+    private static readonly Dictionary<ReferenceHub, (bool TabOpen, Menu LastMenu)> MenuState = [];
+
+    public static void OnStatusReceived(ReferenceHub hub, SSSUserStatusReport sr)
+    {
+        bool isOpen = sr.TabOpen;
+
+        if (!MenuState.TryGetValue(hub, out var state))
+        {
+            MenuState[hub] = (isOpen, hub.GetCurrentMenu());
+            return;
+        }
+
+        if (state.TabOpen == isOpen)
+            return;
+
+        Log.Debug("EventHandler.OnStatusReceived",$"Tab state changed for {hub.nicknameSync.DisplayName}: {state.TabOpen} -> {sr.TabOpen}");
+
+        if (!isOpen)
+        {
+            MenuState[hub] = (isOpen, hub.GetCurrentMenu());
+            hub.LoadMenu(new KeybindMenu());
+        }
+        else
+        {
+            MenuState[hub] = (isOpen, state.LastMenu);
+            if (state.LastMenu != null) hub.LoadMenu(state.LastMenu);
         }
     }
 }

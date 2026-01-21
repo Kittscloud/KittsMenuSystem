@@ -21,7 +21,7 @@ public class KittsMenuSystem : Plugin
     public override string Description { get; } = "";
     public override LoadPriority Priority { get; } = LoadPriority.Lowest;
 
-    public override Version Version { get; } = new Version(0, 2, 0);
+    public override Version Version { get; } = new Version(0, 3, 0);
     public override Version RequiredApiVersion { get; } = new Version(LabApiProperties.CompiledVersion);
 
     public static Config Config { get; set; }
@@ -53,6 +53,7 @@ public class KittsMenuSystem : Plugin
         MenuManager.RegisterQueuedAssemblies();
 
         ServerSpecificSettingsSync.ServerOnSettingValueReceived += EventHandler.OnSettingReceived;
+        ServerSpecificSettingsSync.ServerOnStatusReceived += EventHandler.OnStatusReceived;
 
         Log.Info($"Successfully Enabled {Name}@{Version}");
     }
@@ -66,6 +67,7 @@ public class KittsMenuSystem : Plugin
         CustomHandlersManager.UnregisterEventsHandler(_handler);
 
         ServerSpecificSettingsSync.ServerOnSettingValueReceived -= EventHandler.OnSettingReceived;
+        ServerSpecificSettingsSync.ServerOnStatusReceived -= EventHandler.OnStatusReceived;
 
         Instance = null;
 

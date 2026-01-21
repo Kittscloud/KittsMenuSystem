@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using UserSettings.ServerSpecific;
 
-namespace KittsMenuSystem.Features.Wrappers;
+namespace KittsMenuSystem.Features.Settings;
 
 /// <summary>
 /// Initialize new <see cref="Keybind"/> setting with base <see cref="SSKeybindSetting"/> that calls <see cref="Action"/> when used.
@@ -15,7 +15,7 @@ namespace KittsMenuSystem.Features.Wrappers;
 /// <param name="label">Label of <see cref="SSKeybindSetting"/>.</param>
 /// <param name="onUsed">Triggers <see cref="Action"/> when <see cref="Keybind"/> used.</param>
 /// <param name="suggestedKey">Sets <see cref="SSKeybindSetting.SuggestedKey"/>.</param>
-/// <param name="preventInteractionOnGui">Sets <see cref="SSKeybindSetting.PreventInteractionOnGUI"/>.</param>
+/// <param name="preventInteractionOnGui">Sets <see cref="SSKeybindSetting.PreventInteractionOnGUI"/>, will not work when in settings unless in the menu with the keybind.</param>
 /// <param name="allowSpectatorTrigger">Sets <see cref="SSKeybindSetting.AllowSpectatorTrigger"/></param>
 /// <param name="hint">Hint of <see cref="SSKeybindSetting"/>.</param>
 public class Keybind(int? id, string label, Action<ReferenceHub, bool, SSKeybindSetting> onUsed = null, KeyCode suggestedKey = KeyCode.None, bool preventInteractionOnGui = true, bool allowSpectatorTrigger = true, string hint = null) 

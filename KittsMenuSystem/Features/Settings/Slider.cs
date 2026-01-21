@@ -2,7 +2,7 @@ using Mirror;
 using System;
 using UserSettings.ServerSpecific;
 
-namespace KittsMenuSystem.Features.Wrappers;
+namespace KittsMenuSystem.Features.Settings;
 
 /// <summary>
 /// Initialize new <see cref="Slider"/> setting with base <see cref="SSSliderSetting"/> that calls <see cref="Action"/> when changed.

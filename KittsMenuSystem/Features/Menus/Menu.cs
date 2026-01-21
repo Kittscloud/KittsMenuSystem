@@ -1,4 +1,4 @@
-﻿using KittsMenuSystem.Features.Wrappers;
+﻿using KittsMenuSystem.Features.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,7 +95,7 @@ public abstract class Menu
 
             Log.Debug("Menu.GetSettings", $"Added button returning to {ParentMenu.GetMenu().Name} ({ParentMenu.GetMenu().Id}) for {hub.nicknameSync.DisplayName}.");
         }
-        else if (ParentMenu == null && this.GetType() != typeof(CentralMainMenu) && MenuManager.RegisteredMenus.Count(m => m.CheckAccess(hub) && m.ParentMenu == null) > 1)
+        else if (ParentMenu == null && GetType() != typeof(CentralMainMenu) && GetType() != typeof(KeybindMenu) && MenuManager.RegisteredMenus.Count(m => m.CheckAccess(hub) && m.ParentMenu == null) > 1)
         {
             Log.Debug("Menu.GetSettings", $"{Name} ({Id}) is one of the main menus.");
 
@@ -107,7 +107,7 @@ public abstract class Menu
             Log.Debug("Menu.GetSettings", $"Added button returning to main menu for {hub.nicknameSync.DisplayName}.");
         }
 
-        List<Menu> subMenus = [.. MenuManager.RegisteredMenus.Where(m => m.CheckAccess(hub) && m.ParentMenu == this.GetType())];
+        List<Menu> subMenus = [.. MenuManager.RegisteredMenus.Where(m => m.CheckAccess(hub) && m.ParentMenu == GetType())];
 
         if (!subMenus.IsEmpty())
         {
@@ -140,24 +140,17 @@ public abstract class Menu
 
         settings.AddRange(Settings(hub));
 
-        // Add all other keybinds to the menu so they can be used no matter what menu the player is in
-        settings.Add(new GroupHeader("All Keybinds"));
-        settings.AddRange(
-            [..MenuManager.RegisteredMenus
-            .Where(m => m.CheckAccess(hub) && m.GetType() != GetType())
-            .SelectMany(m => m.Settings(hub))
-            .Where(s => s.Base is SSKeybindSetting)
-            .Cast<Keybind>()]
-        );
-
-        Dictionary<int, BaseSetting> seenIds = [];
+		Dictionary<int, BaseSetting> seenIds = [];
         List<BaseSetting> filteredSettings = [];
 
         foreach (BaseSetting setting in settings)
         {
             // Hash setting with menu to avoid other settings from other menus colliding
-            setting.SettingId += Hash;
-            Log.Debug("Menu.GetSettings", $"Hashed {setting.GetType().Name} ({setting.Base.SettingId}) with {Hash}, new Id: {setting.SettingId}");
+            if (GetType() != typeof(KeybindMenu))
+            {
+                setting.SettingId += Hash;
+                Log.Debug("Menu.GetSettings", $"Hashed {setting.GetType().Name} ({setting.Base.SettingId}) with {Hash}, new Id: {setting.SettingId}");
+            }
 
             if (seenIds.ContainsKey(setting.SettingId))
             {

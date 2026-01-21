@@ -2,7 +2,7 @@ using Mirror;
 using TMPro;
 using UserSettings.ServerSpecific;
 
-namespace KittsMenuSystem.Features.Wrappers;
+namespace KittsMenuSystem.Features.Settings;
 
 /// <summary>
 /// Initialize new <see cref="TextArea"/> setting with base <see cref="SSTextArea"/>.

@@ -1,4 +1,4 @@
-﻿using KittsMenuSystem.Features.Wrappers;
+﻿using KittsMenuSystem.Features.Settings;
 using System.Collections.Generic;
 using System.Reflection;
 

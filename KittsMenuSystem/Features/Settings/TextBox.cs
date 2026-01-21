@@ -3,7 +3,7 @@ using System;
 using TMPro;
 using UserSettings.ServerSpecific;
 
-namespace KittsMenuSystem.Features.Wrappers;
+namespace KittsMenuSystem.Features.Settings;
 
 /// <summary>
 /// Initialize new <see cref="TextBox"/> setting with base <see cref="SSPlaintextSetting"/> that calls <see cref="Action"/> when changed.

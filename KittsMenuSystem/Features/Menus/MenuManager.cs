@@ -1,5 +1,5 @@
 ﻿using KittsMenuSystem.Examples;
-using KittsMenuSystem.Features.Wrappers;
+using KittsMenuSystem.Features.Settings;
 using MEC;
 using System;
 using System.Collections.Generic;
@@ -73,6 +73,7 @@ public static class MenuManager
                     !t.IsInterface &&
                     t != typeof(AssemblyMenu) &&
                     t != typeof(CentralMainMenu) &&
+                    t != typeof(KeybindMenu) &&
                     (t != typeof(MainExample) || KittsMenuSystem.Config.EnableExamples))
                 .Select(t => Activator.CreateInstance(t) as Menu)];
 
@@ -118,6 +119,8 @@ public static class MenuManager
                 throw new ArgumentException($"Menu ID {menu.Id} already registered.");
             if (menu.Id == 0)
                 throw new ArgumentException("Menu ID cannot be 0 (reserved for Main Menu).");
+            if (menu.Id == 1)
+                throw new ArgumentException("Menu ID cannot be 1 (reserved for Keybinds Menu).");
             if (string.IsNullOrEmpty(menu.Name))
                 throw new ArgumentException("Menu name cannot be empty.");
             if (_registeredMenus.Any(m => m.Name == menu.Name))
@@ -238,13 +241,14 @@ public static class MenuManager
     /// </summary>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
     /// <param name="menu">Target <see cref="Menu"/>.</param>
-    internal static void LoadMenu(this ReferenceHub hub, Menu menu)
+    /// <returns>List of <see cref="BaseSetting"/> that was loaded</returns>
+    internal static List<BaseSetting> LoadMenu(this ReferenceHub hub, Menu menu)
     {
         hub.GetCurrentMenu()?.OnClose(hub);
 
         if (menu == null)
         {
-            List<Menu> mainMenus = [.. MenuManager._registeredMenus.Where(m => m.CheckAccess(hub) && m.ParentMenu == null)];
+            List<Menu> mainMenus = [.. _registeredMenus.Where(m => m.CheckAccess(hub) && m.ParentMenu == null)];
 
             menu = mainMenus.Count switch
             {
@@ -260,18 +264,20 @@ public static class MenuManager
         if (!menu.CheckAccess(hub))
         {
             Log.Warn("MenuManager.LoadMenu", $"{hub.nicknameSync.DisplayName} tried loading {menu.Name} without access.");
-            return;
+            return [];
         }
 
         List<BaseSetting> settings = menu.GetSettings(hub);
         _syncedMenus[hub] = menu;
 
-        if (menu is not CentralMainMenu && !menu.SyncedSettings.ContainsKey(hub))
-            Timing.RunCoroutine(hub.SyncMenu(menu, settings));
+        if (menu is not CentralMainMenu and not KeybindMenu && !menu.SyncedSettings.ContainsKey(hub))
+            Timing.RunCoroutine(hub.SyncMenu(menu));
         else
             hub.SendSettings(settings);
 
         menu.OnOpen(hub);
+
+        return settings;
     }
 
     /// <summary>
@@ -312,7 +318,7 @@ public static class MenuManager
             return null;
         }
 
-        foreach (Menu menu in MenuManager._registeredMenus.Where(m => m is TMenu))
+        foreach (Menu menu in _registeredMenus.Where(m => m is TMenu))
         {
             if (!menu.BuiltSettings.TryGetValue(hub, out List<BaseSetting> settings))
             {
@@ -335,7 +341,7 @@ public static class MenuManager
     /// <summary>
     /// Sync settings from a single menu for a ReferenceHub.
     /// </summary>
-    internal static IEnumerator<float> SyncMenu(this ReferenceHub hub, Menu menu, List<BaseSetting> settings = null, bool isLastMenu = false)
+    internal static IEnumerator<float> SyncMenu(this ReferenceHub hub, Menu menu)
     {
         if (!menu.CheckAccess(hub))
         {
@@ -380,11 +386,7 @@ public static class MenuManager
         sendSettings.Clear();
         SyncCache[hub].Clear();
 
-        if (isLastMenu)
-        {
-            if (settings != null) hub.SendSettings(settings);
-            hub.LoadMenu(null);
-        }
+        hub.LoadMenu(new KeybindMenu());
     }
 
     /// <summary>
@@ -394,7 +396,7 @@ public static class MenuManager
     {
         SyncCache.Add(hub, []);
 
-        List<Menu> accessibleMenus = [.. MenuManager._registeredMenus.Where(m => m.CheckAccess(hub))];
+        List<Menu> accessibleMenus = [.. _registeredMenus.Where(m => m.CheckAccess(hub))];
         if (!accessibleMenus.Any())
         {
             Log.Warn("MenuManager.SyncAllMenus", $"No accessible menus for {hub.nicknameSync.DisplayName}.");
@@ -406,7 +408,7 @@ public static class MenuManager
             Menu menu = accessibleMenus[i];
             bool isLast = i == accessibleMenus.Count - 1;
 
-            IEnumerator<float> enumerator = hub.SyncMenu(menu, null, isLast);
+            IEnumerator<float> enumerator = hub.SyncMenu(menu);
             while (enumerator.MoveNext())
                 yield return enumerator.Current;
         }
