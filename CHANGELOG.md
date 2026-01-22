@@ -1,5 +1,8 @@
 # KittsMenuSystem Changelog
 
+## Version 0.3.3
+- Fixed `SSSetings`- Fixed a bug where the returns `SSSetings` from a `BaseSetting` would be the hashed id.
+
 ## Version 0.3.2
 - Fixed `Versions` - Forgot to update the version of the plugin, rookie mistake.
 - Updated `EventHandler.cs` - Now named `MenuEvents.cs`.

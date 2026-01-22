@@ -5,8 +5,12 @@ using LabApi.Events.CustomHandlers;
 using MEC;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using UserSettings.ServerSpecific;
+using Utf8Json;
 
 namespace KittsMenuSystem.Features;
 
@@ -52,16 +56,27 @@ internal class MenuEvents : CustomEventsHandler
 			// Sync setting
 			target.Base = ss;
 
-			// Invoke action depending on type
-			switch (target)
+            // Remove menu hash from setting id to send to invoking
+            ss.SettingId -= menu.Hash;
+
+            try
             {
-                case Button btn when ss is SSButton ssBtn && ssBtn.SyncLastPress.ElapsedMilliseconds == 0L: btn.OnPressed?.Invoke(hub, ssBtn); break;
-                case Dropdown dd when ss is SSDropdownSetting ssDd: dd.OnChanged?.Invoke(hub, ssDd.SyncSelectionIndexRaw, ssDd); break;
-                case Slider sl when ss is SSSliderSetting ssSl: sl.OnChanged?.Invoke(hub, ssSl.SyncFloatValue, ssSl); break;
-                case ABButton yn when ss is SSTwoButtonsSetting ssYn: yn.OnChanged?.Invoke(hub, ssYn.SyncIsA, ssYn); break;
-                case TextBox pt when ss is SSPlaintextSetting ssPt: pt.OnChanged?.Invoke(hub, ssPt.SyncInputText, ssPt); break;
-                case Keybind kb when ss is SSKeybindSetting ssKb: kb.OnUsed?.Invoke(hub, ssKb.SyncIsPressed, ssKb); break;
-                default: throw new InvalidCastException($"Unhandled BaseSetting type {target.GetType().Name}");
+                // Invoke action depending on type
+                switch (target)
+                {
+                    case Button btn when ss is SSButton ssBtn && ssBtn.SyncLastPress.ElapsedMilliseconds == 0L: btn.OnPressed?.Invoke(hub, ssBtn); break;
+                    case Dropdown dd when ss is SSDropdownSetting ssDd: dd.OnChanged?.Invoke(hub, ssDd.SyncSelectionIndexRaw, ssDd); break;
+                    case Slider sl when ss is SSSliderSetting ssSl: sl.OnChanged?.Invoke(hub, ssSl.SyncFloatValue, ssSl); break;
+                    case ABButton yn when ss is SSTwoButtonsSetting ssYn: yn.OnChanged?.Invoke(hub, ssYn.SyncIsA, ssYn); break;
+                    case TextBox pt when ss is SSPlaintextSetting ssPt: pt.OnChanged?.Invoke(hub, ssPt.SyncInputText, ssPt); break;
+                    case Keybind kb when ss is SSKeybindSetting ssKb: kb.OnUsed?.Invoke(hub, ssKb.SyncIsPressed, ssKb); break;
+                    default: throw new InvalidCastException($"Unhandled BaseSetting type {target.GetType().Name}");
+                }
+            }
+            finally
+            {
+                // Restore setting id with has
+                ss.SettingId += menu.Hash;
             }
 
             Log.Debug("EventHandler.OnSettingReceived", $"Successfully handled input for {hub.nicknameSync.DisplayName}: {ss.SettingId} ({ss.GetType().Name})");
