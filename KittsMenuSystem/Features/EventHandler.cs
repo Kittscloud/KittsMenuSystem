@@ -31,7 +31,7 @@ internal class EventHandler : CustomEventsHandler
             if (MenuManager.SyncCache.TryGetValue(hub, out List<ServerSpecificSettingBase> cache))
             {
                 cache.Add(ss);
-                Log.Debug("EventHandler.OnSettingReceived", "Redirected value to SyncCache.");
+                Log.Debug("EventHandler.OnSettingReceived", "Redirected value to SyncCache");
                 return;
             }
 
@@ -39,8 +39,13 @@ internal class EventHandler : CustomEventsHandler
 
 			// Find the sent setting to act on
 			menu.BuiltSettings.TryGetValue(hub, out List<BaseSetting> builtSettings);
-			BaseSetting target = builtSettings?.FirstOrDefault(b => b.SettingId == ss.SettingId)
-				?? throw new ArgumentNullException("Failed to find the sent setting for the hub.");
+			BaseSetting target = builtSettings?.FirstOrDefault(b => b.SettingId == ss.SettingId);
+
+            if (target == null)
+            {
+                Log.Warn("EventHandler.OnSettingReceived", $"No target settings found, discarding input.");
+                return;
+            }
 
 			Log.Debug("EventHandler.OnSettingReceived", $"Target setting found: {target.SettingId} ({target.GetType().Name})");
 
@@ -56,15 +61,15 @@ internal class EventHandler : CustomEventsHandler
                 case ABButton yn when ss is SSTwoButtonsSetting ssYn: yn.OnChanged?.Invoke(hub, ssYn.SyncIsA, ssYn); break;
                 case TextBox pt when ss is SSPlaintextSetting ssPt: pt.OnChanged?.Invoke(hub, ssPt.SyncInputText, ssPt); break;
                 case Keybind kb when ss is SSKeybindSetting ssKb: kb.OnUsed?.Invoke(hub, ssKb.SyncIsPressed, ssKb); break;
-                default: throw new InvalidCastException($"Unhandled BaseSetting type {target.GetType().Name}.");
+                default: throw new InvalidCastException($"Unhandled BaseSetting type {target.GetType().Name}");
             }
 
-            Log.Debug("EventHandler.OnSettingReceived", $"Successfully handled input for {hub.nicknameSync.DisplayName}: {ss.SettingId} ({ss.GetType().Name}).");
+            Log.Debug("EventHandler.OnSettingReceived", $"Successfully handled input for {hub.nicknameSync.DisplayName}: {ss.SettingId} ({ss.GetType().Name})");
         }
         catch (Exception e)
         {
             Log.Error("EventHandler.OnSettingReceived", $"Error processing {ss.SettingId} ({ss.GetType().Name}): {e.Message}");
-            Log.Debug(e.ToString());
+            Log.Debug("EventHandler.OnSettingReceived", e.ToString());
 
             if (KittsMenuSystem.Config.ShowErrorToClient)
             {
@@ -76,7 +81,7 @@ internal class EventHandler : CustomEventsHandler
         }
     }
 
-    private static readonly Dictionary<ReferenceHub, (bool TabOpen, Menu LastMenu)> MenuState = [];
+    internal static readonly Dictionary<ReferenceHub, (bool TabOpen, Menu LastMenu)> MenuState = [];
 
     public static void OnStatusReceived(ReferenceHub hub, SSSUserStatusReport sr)
     {
@@ -91,17 +96,21 @@ internal class EventHandler : CustomEventsHandler
         if (state.TabOpen == isOpen)
             return;
 
-        Log.Debug("EventHandler.OnStatusReceived",$"Tab state changed for {hub.nicknameSync.DisplayName}: {state.TabOpen} -> {sr.TabOpen}");
+        Log.Debug("EventHandler.OnStatusReceived", $"Tab state changed for {hub.nicknameSync.DisplayName}: {state.TabOpen} -> {isOpen}");
 
         if (!isOpen)
         {
-            MenuState[hub] = (isOpen, hub.GetCurrentMenu());
-            hub.LoadMenu(new KeybindMenu());
+            Menu currentMenu = hub.GetCurrentMenu();
+
+            MenuState[hub] = (isOpen, currentMenu is KeybindMenu ? state.LastMenu : currentMenu);
+
+            if (currentMenu is not KeybindMenu)
+                hub.LoadMenu(new KeybindMenu());
         }
         else
         {
+            hub.LoadMenu(state.LastMenu);
             MenuState[hub] = (isOpen, state.LastMenu);
-            if (state.LastMenu != null) hub.LoadMenu(state.LastMenu);
         }
     }
 }

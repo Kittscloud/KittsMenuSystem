@@ -50,10 +50,10 @@ public class KittsMenuSystem : Plugin
         _handler = new EventHandler();
         CustomHandlersManager.RegisterEventsHandler(_handler);
 
-        MenuManager.RegisterQueuedAssemblies();
-
         ServerSpecificSettingsSync.ServerOnSettingValueReceived += EventHandler.OnSettingReceived;
         ServerSpecificSettingsSync.ServerOnStatusReceived += EventHandler.OnStatusReceived;
+
+        MenuManager.RegisterQueuedAssemblies();
 
         Log.Info($"Successfully Enabled {Name}@{Version}");
     }

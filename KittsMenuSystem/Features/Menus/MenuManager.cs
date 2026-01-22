@@ -65,7 +65,7 @@ public static class MenuManager
 
         try
         {
-            Log.Debug("MenuManager.Register", $"Loading assembly {assembly.GetName().Name}...");
+            Log.Debug("MenuManager.Register", $"Loading assembly {assembly.GetName().Name}..");
 
             List<Menu> allMenus = [.. assembly.GetTypes()
                 .Where(t => t.BaseType == typeof(Menu) &&
@@ -92,7 +92,7 @@ public static class MenuManager
                     Log.Debug("MenuManager.Register", e.ToString());
                 }
 
-            Log.Info("MenuManager.Register", $"Loaded assembly {assembly.GetName().Name}: {_registeredMenus.Count}/{allMenus.Count} menus registered.");
+            Log.Info("MenuManager.Register", $"Loaded assembly {assembly.GetName().Name}: {_registeredMenus.Count}/{allMenus.Count} menus registered");
         }
         catch (Exception e)
         {
@@ -106,32 +106,32 @@ public static class MenuManager
     /// </summary>
     /// <param name="menu"><see cref="Menu"/> to register.</param>
     /// <exception cref="ArgumentException">Thrown if menu is invalid or has duplicate IDs.</exception>
-    internal static void Register(this Menu menu)
+    public static void Register(this Menu menu)
     {
         try
         {
             if (menu == null || (menu.ParentMenu == typeof(MainExample) && !KittsMenuSystem.Config.EnableExamples))
                 return;
 
-            Log.Debug("MenuManager.Register", $"Loading menu {menu.Name}...");
+            Log.Debug("MenuManager.Register", $"Loading menu {menu.Name}..");
 
             if (menu.CheckSameId())
-                throw new ArgumentException($"Menu ID {menu.Id} already registered.");
+                throw new ArgumentException($"Menu ID {menu.Id} already registered");
             if (menu.Id == 0)
-                throw new ArgumentException("Menu ID cannot be 0 (reserved for Main Menu).");
+                throw new ArgumentException("Menu ID cannot be 0 (reserved for Main Menu)");
             if (menu.Id == 1)
-                throw new ArgumentException("Menu ID cannot be 1 (reserved for Keybinds Menu).");
+                throw new ArgumentException("Menu ID cannot be 1 (reserved for Keybinds Menu)");
             if (string.IsNullOrEmpty(menu.Name))
-                throw new ArgumentException("Menu name cannot be empty.");
+                throw new ArgumentException("Menu name cannot be empty");
             if (_registeredMenus.Any(m => m.Name == menu.Name))
-                throw new ArgumentException($"Duplicate menu name '{menu.Name}'.");
+                throw new ArgumentException($"Duplicate menu name '{menu.Name}'");
 
             if (menu.ParentMenu != null && !_registeredMenus.Any(m => m.GetType() == menu.ParentMenu))
-                throw new ArgumentException($"Menu {menu.Name} has invalid related menu {menu.ParentMenu.FullName}.");
+                throw new ArgumentException($"Menu {menu.Name} has invalid related menu {menu.ParentMenu.FullName}");
 
             _registeredMenus.Add(menu);
             menu.OnRegistered();
-            Log.Debug("MenuManager.Register", $"Menu {menu.Name} registered successfully.");
+            Log.Debug("MenuManager.Register", $"Menu {menu.Name} registered successfully");
         }
         catch (Exception e)
         {
@@ -190,7 +190,7 @@ public static class MenuManager
     /// Register <see cref="ServerSpecificSettingBase"/> displayed on the top of all menus.
     /// </summary>
     /// <param name="toPin">The list of <see cref="ServerSpecificSettingBase"/> to pin.</param>
-    public static void RegisterPin(this List<TextArea> toPin) => _pinned[Assembly.GetCallingAssembly()] = toPin;
+    public static void RegisterPins(this List<TextArea> toPin) => _pinned[Assembly.GetCallingAssembly()] = toPin;
 
     /// <summary>
     /// Remove registered pins from <see cref="Assembly.GetCallingAssembly"/>.
@@ -258,12 +258,12 @@ public static class MenuManager
 
             Log.Debug("MenuManager.LoadMenu", mainMenus.Count == 1
                 ? $"Triggered the only main menu: {menu.Name}."
-                : $"Built central main menu with {mainMenus.Count} submenus for {hub.nicknameSync.DisplayName}.");
+                : $"Built central main menu with {mainMenus.Count} submenus for {hub.nicknameSync.DisplayName}");
         }
 
         if (!menu.CheckAccess(hub))
         {
-            Log.Warn("MenuManager.LoadMenu", $"{hub.nicknameSync.DisplayName} tried loading {menu.Name} without access.");
+            Log.Warn("MenuManager.LoadMenu", $"{hub.nicknameSync.DisplayName} tried loading {menu.Name} without access");
             return [];
         }
 
@@ -314,7 +314,7 @@ public static class MenuManager
     {
         if (typeof(TSetting).BaseType == typeof(BaseSetting))
         {
-            Log.Error("MenuManager.GetSetting", $"{nameof(TSetting)} needs to be of base type.");
+            Log.Error("MenuManager.GetSetting", $"{nameof(TSetting)} needs to be of base type");
             return null;
         }
 
@@ -345,7 +345,7 @@ public static class MenuManager
     {
         if (!menu.CheckAccess(hub))
         {
-            Log.Debug("MenuManager.SyncMenu", $"{hub.nicknameSync.DisplayName} has no access to {menu.Name}.");
+            Log.Debug("MenuManager.SyncMenu", $"{hub.nicknameSync.DisplayName} has no access to {menu.Name}");
             yield break;
         }
 
@@ -365,7 +365,7 @@ public static class MenuManager
 
         if (SyncCache[hub].Count < sendSettings.Count)
         {
-            Log.Error("MenuManager.SyncMenu", $"Timeout syncing {hub.nicknameSync.DisplayName} on {menu.Name}.");
+            Log.Error("MenuManager.SyncMenu", $"Timeout syncing {hub.nicknameSync.DisplayName} on {menu.Name}");
             yield break;
         }
 
@@ -381,12 +381,14 @@ public static class MenuManager
 
         menu.SyncedSettings[hub] = syncedWrapped;
 
-        Log.Debug("MenuManager.SyncMenu", $"Synced {syncedWrapped.Count} settings for {hub.nicknameSync.DisplayName} in {menu.Name}.");
+        Log.Debug("MenuManager.SyncMenu", $"Synced {syncedWrapped.Count} settings for {hub.nicknameSync.DisplayName} in {menu.Name}");
 
         sendSettings.Clear();
         SyncCache[hub].Clear();
 
         hub.LoadMenu(new KeybindMenu());
+
+        EventHandler.MenuState[hub] = (false, null);
     }
 
     /// <summary>
@@ -399,7 +401,7 @@ public static class MenuManager
         List<Menu> accessibleMenus = [.. _registeredMenus.Where(m => m.CheckAccess(hub))];
         if (!accessibleMenus.Any())
         {
-            Log.Warn("MenuManager.SyncAllMenus", $"No accessible menus for {hub.nicknameSync.DisplayName}.");
+            Log.Warn("MenuManager.SyncAllMenus", $"No accessible menus for {hub.nicknameSync.DisplayName}");
             yield break;
         }
 

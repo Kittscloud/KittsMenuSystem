@@ -13,6 +13,7 @@
         <PlatformTarget>x64</PlatformTarget>
 
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Platforms>x64</Platforms>
 		

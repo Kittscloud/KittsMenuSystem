@@ -55,13 +55,13 @@ internal static class CompatibilityPatch
 
         if (MenuManager.RegisteredMenus.Any(m => m.Name == name))
         {
-            Log.Warn("CompatibilityPatch.Load", $"Assembly {name} tried duplicate menu name, using assembly name.");
+            Log.Warn("CompatibilityPatch.Load", $"Assembly {name} tried duplicate menu name, using assembly name");
             name = assembly.GetName().Name;
         }
 
         if (MenuManager.RegisteredMenus.Any(m => m.Name == name))
         {
-            Log.Error("CompatibilityPatch.Load", $"Assembly {name} failed to register menu.");
+            Log.Error("CompatibilityPatch.Load", $"Assembly {name} failed to register menu");
             LockedAssembly.Add(assembly);
             return;
         }

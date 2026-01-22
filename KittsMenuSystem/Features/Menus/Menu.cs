@@ -76,42 +76,42 @@ public abstract class Menu
     /// <returns>List of <see cref="ServerSpecificSettingBase"/> to send to the client.</returns>
     internal List<BaseSetting> GetSettings(ReferenceHub hub)
     {
-        Log.Debug("Menu.GetSettings", $"Generating settings for {hub.nicknameSync.DisplayName} in {Name} ({Id}).");
+        Log.Debug("Menu.GetSettings", $"Generating settings for {hub.nicknameSync.DisplayName} in {Name} ({Id})");
 
         List<BaseSetting> settings = [];
 
         // Add _pinned textareas
         settings.AddRange(MenuManager.Pinned.Values.SelectMany(s => s));
-        if (!MenuManager.Pinned.Values.IsEmpty()) Log.Debug("Menu.GetSettings", $"Added {MenuManager.Pinned.Values.Count()} _pinned settings for {hub.nicknameSync.DisplayName}.");
+        if (!MenuManager.Pinned.Values.IsEmpty()) Log.Debug("Menu.GetSettings", $"Added {MenuManager.Pinned.Values.Count()} _pinned settings for {hub.nicknameSync.DisplayName}");
 
         if (ParentMenu != null)
         {
-            Log.Debug("Menu.GetSettings", $"{Name} ({Id}) has a parent menu.");
+            Log.Debug("Menu.GetSettings", $"{Name} ({Id}) has a parent menu");
 
             settings.Add(new Button(
                 string.Format(KittsMenuSystem.Config.Translation.ReturnTo.Label, MenuManager.GetMenu(ParentMenu)?.Name ?? "Unknown"),
                 KittsMenuSystem.Config.Translation.ReturnTo.ButtonText, (h, _) => h.LoadMenu(ParentMenu.GetMenu())
             ));
 
-            Log.Debug("Menu.GetSettings", $"Added button returning to {ParentMenu.GetMenu().Name} ({ParentMenu.GetMenu().Id}) for {hub.nicknameSync.DisplayName}.");
+            Log.Debug("Menu.GetSettings", $"Added button returning to {ParentMenu.GetMenu().Name} ({ParentMenu.GetMenu().Id}) for {hub.nicknameSync.DisplayName}");
         }
         else if (ParentMenu == null && GetType() != typeof(CentralMainMenu) && GetType() != typeof(KeybindMenu) && MenuManager.RegisteredMenus.Count(m => m.CheckAccess(hub) && m.ParentMenu == null) > 1)
         {
-            Log.Debug("Menu.GetSettings", $"{Name} ({Id}) is one of the main menus.");
+            Log.Debug("Menu.GetSettings", $"{Name} ({Id}) is one of the main menus");
 
             settings.Add(new Button(
                 string.Format(KittsMenuSystem.Config.Translation.ReturnTo.Label, "Main Menu"),
                 KittsMenuSystem.Config.Translation.ReturnTo.ButtonText, (h, _) => h.LoadMenu(null)
             ));
 
-            Log.Debug("Menu.GetSettings", $"Added button returning to main menu for {hub.nicknameSync.DisplayName}.");
+            Log.Debug("Menu.GetSettings", $"Added button returning to main menu for {hub.nicknameSync.DisplayName}");
         }
 
         List<Menu> subMenus = [.. MenuManager.RegisteredMenus.Where(m => m.CheckAccess(hub) && m.ParentMenu == GetType())];
 
         if (!subMenus.IsEmpty())
         {
-            Log.Debug("Menu.GetSettings", $"{Name} ({Id}) has submenu(s).");
+            Log.Debug("Menu.GetSettings", $"{Name} ({Id}) has submenu(s)");
 
             settings.Add(new GroupHeader("Sub Menu(s)"));
 
@@ -122,19 +122,19 @@ public abstract class Menu
                     KittsMenuSystem.Config.Translation.OpenMenu.ButtonText, (h, _) => h.LoadMenu(subMenu)
                 ));
 
-                Log.Debug("Menu.GetSettings", $"Added sub menu button going to {subMenu.Name} ({subMenu.Id}) for {hub.nicknameSync.DisplayName}.");
+                Log.Debug("Menu.GetSettings", $"Added sub menu button going to {subMenu.Name} ({subMenu.Id}) for {hub.nicknameSync.DisplayName}");
             }
         }
 
         settings.Add(new GroupHeader(Name));
-        Log.Debug("Menu.GetSettings", $"Added main header of {Name} ({Id}) for {hub.nicknameSync.DisplayName}.");
+        Log.Debug("Menu.GetSettings", $"Added main header of {Name} ({Id}) for {hub.nicknameSync.DisplayName}");
 
         // AssemblyMenu hub-specific overrides
         if (this is AssemblyMenu assemblyMenu && assemblyMenu.ActuallySentToClient.TryGetValue(hub, out List<BaseSetting> overrideSettings) && overrideSettings != null)
         {
             if (overrideSettings.Count == 0) settings.RemoveAt(settings.Count - 1); // Remove footer if empty
             settings.AddRange(overrideSettings);
-            Log.Debug("Menu.GetSettings", $"Applied {overrideSettings.Count} assembly menu override settings for {hub.nicknameSync.DisplayName}.");
+            Log.Debug("Menu.GetSettings", $"Applied {overrideSettings.Count} assembly menu override settings for {hub.nicknameSync.DisplayName}");
             return settings;
         }
 
@@ -154,7 +154,7 @@ public abstract class Menu
 
             if (seenIds.ContainsKey(setting.SettingId))
             {
-                Log.Warn("Menu.GetSettings", $"Skipping duplicate {setting.GetType().Name} ({setting.SettingId}) in {Name} ({Id}) for {hub.nicknameSync.DisplayName}.");
+                Log.Warn("Menu.GetSettings", $"Skipping duplicate {setting.GetType().Name} ({setting.SettingId}) in {Name} ({Id}) for {hub.nicknameSync.DisplayName}");
                 continue;
             }
 
@@ -162,7 +162,7 @@ public abstract class Menu
             filteredSettings.Add(setting);
         }
 
-        Log.Debug("Menu.GetSettings", $"Finalized {settings.Count} settings on {Name} ({Id}) for {hub.nicknameSync.DisplayName}.");
+        Log.Debug("Menu.GetSettings", $"Finalized {settings.Count} settings on {Name} ({Id}) for {hub.nicknameSync.DisplayName}");
 
         BuiltSettings[hub] = filteredSettings;
         return filteredSettings;

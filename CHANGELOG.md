@@ -1,8 +1,13 @@
 # KittsMenuSystem Changelog
 
+## Version 0.3.1
+- Fixed `KeybindMenu` - Fixed an issue where keybind menu was loading when in settings.
+- Fixed `Server-Specific` - Fixed an issue where pressing the `Server-Specific` tab while in the `Server-Sepcific` tab would cause an error.
+- Fixed `Config` - Fixed unused configurations in the config file.
+
 ## Version 0.3.0
 - Added `KeybindMenu` - Used to load all keybinds when player not in settings.
-- Added `OnStatusReceived` function - Updated the settings to and from `KeybindMenu` when player not in settings.
+- Added `OnStatusReceived` function - Updates the settings to and from `KeybindMenu` when player not in settings tab.
 - Updated `KittsMenuSystem.Features.Wrappers` namespace - Now named `KittsMenuSystem.Features.Settings`.
 - Removed `All Keybinds` on all `Menus` - No longer needed due to `KeybindMenu`. 
 
