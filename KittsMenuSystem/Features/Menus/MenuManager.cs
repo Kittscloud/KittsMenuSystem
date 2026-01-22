@@ -216,13 +216,6 @@ public static class MenuManager
     internal static AssemblyMenu GetMenu(Assembly assembly) => _registeredMenus.OfType<AssemblyMenu>().FirstOrDefault(x => x.Assembly == assembly);
 
     /// <summary>
-    /// Reload a <see cref="Menu"/> for <see cref="ReferenceHub"/>.
-    /// </summary>
-    /// <param name="hub">The target <see cref="ReferenceHub"/>.</param>
-    /// <param name="menu">The target <see cref="ReferenceHub"/>.</param>
-    public static void ReloadMenu<T>(this ReferenceHub hub, T menu) where T : Menu => hub.LoadMenu(menu);
-
-    /// <summary>
     /// Reload current <see cref="Menu"/> for <see cref="ReferenceHub"/>.
     /// </summary>
     /// <param name="hub">The target <see cref="ReferenceHub"/>.</param>
@@ -388,7 +381,7 @@ public static class MenuManager
 
         hub.LoadMenu(new KeybindMenu());
 
-        EventHandler.MenuState[hub] = (false, null);
+        MenuEvents.MenuState[hub] = (false, null);
     }
 
     /// <summary>

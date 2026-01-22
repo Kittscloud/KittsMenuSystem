@@ -10,7 +10,7 @@ using UserSettings.ServerSpecific;
 
 namespace KittsMenuSystem.Features;
 
-internal class EventHandler : CustomEventsHandler
+internal class MenuEvents : CustomEventsHandler
 {
     public override void OnPlayerJoined(PlayerJoinedEventArgs ev) =>
         Timing.RunCoroutine(ev.Player.ReferenceHub.SyncAllMenus());

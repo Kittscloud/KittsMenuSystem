@@ -8,7 +8,7 @@ using LabApi.Loader.Features.Plugins;
 using LabApi.Loader.Features.Plugins.Enums;
 using System;
 using UserSettings.ServerSpecific;
-using EventHandler = KittsMenuSystem.Features.EventHandler;
+using MenuEvents = KittsMenuSystem.Features.MenuEvents;
 
 namespace KittsMenuSystem;
 
@@ -21,14 +21,14 @@ public class KittsMenuSystem : Plugin
     public override string Description { get; } = "";
     public override LoadPriority Priority { get; } = LoadPriority.Lowest;
 
-    public override Version Version { get; } = new Version(0, 3, 0);
+    public override Version Version { get; } = new Version(0, 3, 2);
     public override Version RequiredApiVersion { get; } = new Version(LabApiProperties.CompiledVersion);
 
     public static Config Config { get; set; }
     private bool _errorLoadingConfig = false;
 
     private Harmony _harmony;
-    private EventHandler _handler;
+    private MenuEvents _menuEvents;
 
     public override void Enable()
     {
@@ -47,11 +47,11 @@ public class KittsMenuSystem : Plugin
         _harmony = new Harmony("fr.kittscloud.patches");
         _harmony.PatchAll();
 
-        _handler = new EventHandler();
-        CustomHandlersManager.RegisterEventsHandler(_handler);
+        _menuEvents = new();
+        CustomHandlersManager.RegisterEventsHandler(_menuEvents);
 
-        ServerSpecificSettingsSync.ServerOnSettingValueReceived += EventHandler.OnSettingReceived;
-        ServerSpecificSettingsSync.ServerOnStatusReceived += EventHandler.OnStatusReceived;
+        ServerSpecificSettingsSync.ServerOnSettingValueReceived += MenuEvents.OnSettingReceived;
+        ServerSpecificSettingsSync.ServerOnStatusReceived += MenuEvents.OnStatusReceived;
 
         MenuManager.RegisterQueuedAssemblies();
 
@@ -64,17 +64,17 @@ public class KittsMenuSystem : Plugin
 
         MenuManager.UnregisterAllMenus();
 
-        CustomHandlersManager.UnregisterEventsHandler(_handler);
+        CustomHandlersManager.UnregisterEventsHandler(_menuEvents);
 
-        ServerSpecificSettingsSync.ServerOnSettingValueReceived -= EventHandler.OnSettingReceived;
-        ServerSpecificSettingsSync.ServerOnStatusReceived -= EventHandler.OnStatusReceived;
+        ServerSpecificSettingsSync.ServerOnSettingValueReceived -= MenuEvents.OnSettingReceived;
+        ServerSpecificSettingsSync.ServerOnStatusReceived -= MenuEvents.OnStatusReceived;
 
         Instance = null;
 
         _harmony.UnpatchAll();
         _harmony = null;
 
-        _handler = null;
+        _menuEvents = null;
 
         Log.Info($"Successfully Disabled {Name}@{Version}");
     }

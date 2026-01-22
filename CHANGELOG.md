@@ -1,5 +1,11 @@
 # KittsMenuSystem Changelog
 
+## Version 0.3.2
+- Fixed `Versions` - Forgot to update the version of the plugin, rookie mistake.
+- Updated `EventHandler.cs` - Now named `MenuEvents.cs`.
+- Updated `Dependencies` - Removed unnecessary dependencies.
+- Removed `ReloadMenu` function - Don't see a use for it.
+
 ## Version 0.3.1
 - Fixed `KeybindMenu` - Fixed an issue where keybind menu was loading when in settings.
 - Fixed `Server-Specific` - Fixed an issue where pressing the `Server-Specific` tab while in the `Server-Sepcific` tab would cause an error.
