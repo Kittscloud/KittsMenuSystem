@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UserSettings.ServerSpecific;
+using static UnityEngine.Rendering.RayTracingAccelerationStructure;
 
 namespace KittsMenuSystem.Features.Menus;
 
@@ -322,7 +323,10 @@ public static class MenuManager
             ServerSpecificSettingBase t = settings
                 .Select(b => b.Base)
                 .Where(s => s is TSetting)
-                .FirstOrDefault(s => s.SettingId - menu.Hash == settingId);
+                .FirstOrDefault(s => 
+                    s.SettingId == settingId || 
+                    s.SettingId - menu.Hash == settingId
+                );
 
             return t as TSetting;
         }

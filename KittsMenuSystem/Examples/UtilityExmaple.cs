@@ -19,32 +19,25 @@ internal class UtilityExmaple : Menu
     private static readonly HashSet<ReferenceHub> _activeSpeedBoosts = [];
 
     private readonly List<BaseSetting> _addedSettings = [];
-    private List<ColorPreset> _presets;
-    private LightShadows[] _shadowsType;
-    private LightType[] _lightType;
-    private TextArea _selectedColorTextArea;
+    private readonly List<ColorPreset> _presets = [
+        new("White", Color.white),
+        new("Black", Color.black),
+        new("Gray", Color.gray),
+        new("Red", Color.red),
+        new("Green", Color.green),
+        new("Blue", Color.blue),
+        new("Yellow", Color.yellow),
+        new("Cyan", Color.cyan),
+        new("Magenta", Color.magenta),
+    ];
+    private readonly LightShadows[] _shadowsType = EnumUtils<LightShadows>.Values;
+    private readonly LightType[] _lightType = EnumUtils<LightType>.Values;
+    private readonly TextArea _selectedColorTextArea = new(5, "Selected Color: None");
     private readonly List<LightSourceToy> _spawnedToys = [];
 
     public override List<BaseSetting> Settings(ReferenceHub hub)
     {
         List<BaseSetting> settings = [];
-
-        // Init Light Spawner Lists
-        _presets ??=
-        [
-            new("White", Color.white),
-            new("Black", Color.black),
-            new("Gray", Color.gray),
-            new("Red", Color.red),
-            new("Green", Color.green),
-            new("Blue", Color.blue),
-            new("Yellow", Color.yellow),
-            new("Cyan", Color.cyan),
-            new("Magenta", Color.magenta),
-        ];
-        _shadowsType ??= EnumUtils<LightShadows>.Values;
-        _lightType ??= EnumUtils<LightType>.Values;
-        _selectedColorTextArea ??= new TextArea(5, "Selected Color: None");
 
         settings = [
             // It's always good to have your own button at the top of all menus to reload menus
@@ -95,6 +88,21 @@ internal class UtilityExmaple : Menu
             new Button("Confirm Spawning", "Spawn", (hub, _) => Spawn(hub))
         ];
 
+        // Make sure to always rebuild settings if you add them somewhere else
+        _addedSettings.Clear();
+
+        if (_spawnedToys.Count != 0)
+        {
+            _addedSettings.Add(new GroupHeader("Spawned Lights"));
+            _addedSettings.Add(new Button(9, "All Lights", "Destroy All (HOLD)", (_, _) => DestroyAll(), 2f));
+
+            foreach (LightSourceToy toy in _spawnedToys)
+            {
+                int id = (int)toy.Base.netId;
+                _addedSettings.Add(new Button(id, $"Light #{id}", "Destroy (HOLD)", (_, s) => Destroy(s.SettingId), 0.4f));
+            }
+        }
+
         // You can also add another list that can be updated whenever, such as when adding destroy buttons for spawning lights
         settings.AddRange(_addedSettings);
 
@@ -119,7 +127,7 @@ internal class UtilityExmaple : Menu
     }
 
     private void ReloadColorInfoForUser(ReferenceHub hub) => (_selectedColorTextArea.Base as SSTextArea).SendTextUpdate(GetColorInfoForUser(hub), receiveFilter: (h) => h == hub);
-    public string GetColorInfoForUser(ReferenceHub hub) => "Selected color: <color=" + this.GetColorInfo(hub).ToHex() + ">███████████</color>";
+    public string GetColorInfoForUser(ReferenceHub hub) => "Selected color: <color=" + GetColorInfo(hub).ToHex() + ">███████████</color>";
     private Color GetColorInfo(ReferenceHub hub) => _presets[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(4).SyncSelectionIndexRaw].Color;
 
     private void Spawn(ReferenceHub hub)
@@ -138,26 +146,7 @@ internal class UtilityExmaple : Menu
 
         _spawnedToys.Add(toy);
 
-        RebuildDestroyButtons();
-
         MenuManager.ReloadAll();
-    }
-
-    private void RebuildDestroyButtons()
-    {
-        _addedSettings.Clear();
-
-        if (_spawnedToys.Count == 0)
-            return;
-
-        _addedSettings.Add(new GroupHeader("Spawned Lights"));
-        _addedSettings.Add(new Button(9, "All Lights", "Destroy All (HOLD)", (_, _) => DestroyAll(), 2f));
-
-        foreach (LightSourceToy toy in _spawnedToys)
-        {
-            int id = (int)toy.Base.netId;
-            _addedSettings.Add(new Button(id, $"Light #{id}", "Destroy (HOLD)", (_, setting) => Destroy(setting.SettingId), 0.4f));
-        }
     }
 
 
@@ -182,7 +171,6 @@ internal class UtilityExmaple : Menu
             NetworkServer.Destroy(toy.GameObject);
 
         _spawnedToys.Clear();
-        RebuildDestroyButtons();
         MenuManager.ReloadAll();
     }
 
@@ -195,7 +183,6 @@ internal class UtilityExmaple : Menu
         _spawnedToys.Remove(toy);
         NetworkServer.Destroy(toy.GameObject);
 
-        RebuildDestroyButtons();
         MenuManager.ReloadAll();
     }
 

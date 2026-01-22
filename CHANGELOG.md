@@ -1,5 +1,8 @@
 # KittsMenuSystem Changelog
 
+## Version 0.3.4
+- Fixed `GetSetting` function - Fixed a bug where function could not find setting while SSSetting was in the unhashed state.
+
 ## Version 0.3.3
 - Fixed `SSSetings`- Fixed a bug where the returns `SSSetings` from a `BaseSetting` would be the hashed id.
 

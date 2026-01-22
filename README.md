@@ -16,7 +16,7 @@
 That being said, the original plugin developer, [`skyfr0676`](https://github.com/skyfr0676), created a fantastic plugin, and I am personally very grateful that this project existed in the first place.
 
 ## Consider Supporting?
-If you enjoy this project and would like to support future development, I would greatly appreciate it if you considered donating via my [`Ko-Fi`](https://ko-fi.com/kittscloud)
+If you enjoy this project and would like to support future development, I would greatly appreciate it if you considered donating via my [`Ko-Fi`](https://ko-fi.com/kittscloud).
 
 ## How to use KittsMenuSystem:
 To install `KittsMenuSystem` on your server, you will need:
