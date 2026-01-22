@@ -119,7 +119,7 @@ internal class UtilityExmaple : Menu
     }
 
     private void ReloadColorInfoForUser(ReferenceHub hub) => (_selectedColorTextArea.Base as SSTextArea).SendTextUpdate(GetColorInfoForUser(hub), receiveFilter: (h) => h == hub);
-    public string GetColorInfoForUser(ReferenceHub hub) => "Selected color: <color=" + GetColorInfo(hub).ToHex() + ">███████████</color>";
+    public string GetColorInfoForUser(ReferenceHub hub) => "Selected color: <color=" + this.GetColorInfo(hub).ToHex() + ">███████████</color>";
     private Color GetColorInfo(ReferenceHub hub) => _presets[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(4).SyncSelectionIndexRaw].Color;
 
     private void Spawn(ReferenceHub hub)
