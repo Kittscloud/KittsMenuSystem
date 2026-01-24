@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
@@ -26,8 +25,7 @@ using System.Runtime.InteropServices;
 //
 //      Major Version
 //      Minor Version
-//      Build Number
-//      Revision
+//      Fix Version
 //
-[assembly: AssemblyVersion("0.3.4")]
+[assembly: AssemblyVersion("0.4.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

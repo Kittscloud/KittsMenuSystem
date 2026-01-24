@@ -47,7 +47,7 @@ internal class UtilityExmaple : Menu
             //new GroupHeader("Abilities"),
             new Keybind("Speed Boost (Human-only)", (h, isPressed, _) =>
             {
-                bool toggleMode = h.GetSetting<UtilityExmaple, SSTwoButtonsSetting>(1).SyncIsB;
+                bool toggleMode = GetSetting<SSTwoButtonsSetting>(h, 1).SyncIsB;
 
                 if (toggleMode)
                 {
@@ -69,6 +69,8 @@ internal class UtilityExmaple : Menu
             
             // You can also use the hub parameter from the GetSetting function to display specific things to that hub, or have defaults
             // For exmaple, you can put the players name as a placeholder so its not empty when first going in the menu
+            // The reason default values are funciton is becuase the default value needs to be set after settings have been built
+            // This is to avoid any errors if you try to get a setting or value for the default that hasn't actually been built yet
             new GroupHeader("Name Change"),
             new TextBox("Name", (h, newName, _) => h.nicknameSync.DisplayName = newName, hub.nicknameSync.DisplayName),
 
@@ -126,9 +128,9 @@ internal class UtilityExmaple : Menu
         }
     }
 
-    private void ReloadColorInfoForUser(ReferenceHub hub) => (_selectedColorTextArea.Base as SSTextArea).SendTextUpdate(GetColorInfoForUser(hub), receiveFilter: (h) => h == hub);
+    private void ReloadColorInfoForUser(ReferenceHub hub) => (_selectedColorTextArea.Base as SSTextArea).SendTextUpdate(GetColorInfoForUser(hub), false, receiveFilter: (h) => h == hub);
     public string GetColorInfoForUser(ReferenceHub hub) => "Selected color: <color=" + GetColorInfo(hub).ToHex() + ">███████████</color>";
-    private Color GetColorInfo(ReferenceHub hub) => _presets[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(4).SyncSelectionIndexRaw].Color;
+    private Color GetColorInfo(ReferenceHub hub) => _presets[GetSetting<SSDropdownSetting>(hub, 4).SyncSelectionIndexRaw].Color;
 
     private void Spawn(ReferenceHub hub)
     {
@@ -136,12 +138,12 @@ internal class UtilityExmaple : Menu
         if (toy == null)
             return;
 
-        toy.Intensity = hub.GetSetting<UtilityExmaple, SSSliderSetting>(2).SyncFloatValue;
-        toy.Range = hub.GetSetting<UtilityExmaple, SSSliderSetting>(3).SyncFloatValue;
+        toy.Intensity = GetSetting<SSSliderSetting>(hub, 2).SyncFloatValue;
+        toy.Range = GetSetting<SSSliderSetting>(hub, 3).SyncFloatValue;
         toy.Color = GetColorInfo(hub);
-        toy.ShadowType = _shadowsType[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(6).SyncSelectionIndexRaw];
-        toy.ShadowStrength = hub.GetSetting<UtilityExmaple, SSSliderSetting>(7).SyncFloatValue;
-        toy.Type = _lightType[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(8).SyncSelectionIndexRaw];
+        toy.ShadowType = _shadowsType[GetSetting<SSDropdownSetting>(hub, 6).SyncSelectionIndexRaw];
+        toy.ShadowStrength = GetSetting<SSSliderSetting>(hub, 7).SyncFloatValue;
+        toy.Type = _lightType[GetSetting<SSDropdownSetting>(hub, 8).SyncSelectionIndexRaw];
         toy.Transform.position = hub.transform.position;
 
         _spawnedToys.Add(toy);

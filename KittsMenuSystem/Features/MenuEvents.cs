@@ -2,7 +2,6 @@ using KittsMenuSystem.Features.Menus;
 using KittsMenuSystem.Features.Settings;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.CustomHandlers;
-using MEC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +11,14 @@ namespace KittsMenuSystem.Features;
 
 internal class MenuEvents : CustomEventsHandler
 {
-    public override void OnPlayerJoined(PlayerJoinedEventArgs ev) =>
-        Timing.RunCoroutine(ev.Player.ReferenceHub.SyncAllMenus());
+    public override void OnPlayerJoined(PlayerJoinedEventArgs ev)
+    {
+        foreach (Menu menu in MenuManager.RegisteredMenus.Where(m => m.CheckAccess(ev.Player.ReferenceHub)))
+            menu.ReloadFor(ev.Player.ReferenceHub);
+
+        ev.Player.ReferenceHub.LoadMenu(new GlobalMenu());
+        MenuState[ev.Player.ReferenceHub] = (false, null);
+    }
 
     public override void OnPlayerLeft(PlayerLeftEventArgs ev) =>
         ev.Player.ReferenceHub.DeleteFromSyncedMenus();
@@ -26,31 +31,24 @@ internal class MenuEvents : CustomEventsHandler
         Log.Debug("EventHandler.OnSettingReceived", $"Received input for {hub.nicknameSync.DisplayName}: {ss.SettingId} ({ss.GetType().Name})");
 
         try
-        {
-            // If still in sync cache, just store
-            if (MenuManager.SyncCache.TryGetValue(hub, out List<ServerSpecificSettingBase> cache))
-            {
-                cache.Add(ss);
-                Log.Debug("EventHandler.OnSettingReceived", "Redirected value to SyncCache");
-                return;
-            }
+        {   
+            Menu menu = hub.GetCurrentMenu();
 
-			Menu menu = hub.GetCurrentMenu();
-
-			// Find the sent setting to act on
-			menu.BuiltSettings.TryGetValue(hub, out List<BaseSetting> builtSettings);
-			BaseSetting target = builtSettings?.FirstOrDefault(b => b.SettingId == ss.SettingId);
+			BaseSetting target = menu.GetSettings(hub, false, false).FirstOrDefault(b => b.SettingId == ss.SettingId);
 
             if (target == null)
             {
-                Log.Warn("EventHandler.OnSettingReceived", $"No target settings found, discarding input.");
+                Log.Warn("EventHandler.OnSettingReceived", $"No target setting found, discarding input.");
                 return;
             }
 
 			Log.Debug("EventHandler.OnSettingReceived", $"Target setting found: {target.SettingId} ({target.GetType().Name})");
 
-			// Sync setting
-			target.Base = ss;
+            // Sync setting
+            target.Base = ss;
+
+            // Restore original definition
+            RestoreFromOriginal(ss, ss.OriginalDefinition);
 
             // Remove menu hash from setting id to send to invoking
             ss.SettingId -= menu.Hash;
@@ -71,7 +69,7 @@ internal class MenuEvents : CustomEventsHandler
             }
             finally
             {
-                // Restore setting id with has
+                // Restore hash
                 ss.SettingId += menu.Hash;
             }
 
@@ -89,6 +87,49 @@ internal class MenuEvents : CustomEventsHandler
                     new Button(KittsMenuSystem.Config.Translation.ReloadButton.Label, KittsMenuSystem.Config.Translation.ReloadButton.ButtonText, (h, _) => h.LoadMenu(null))
                 ]);
             }
+        }
+    }
+
+    private static void RestoreFromOriginal(ServerSpecificSettingBase target, ServerSpecificSettingBase original)
+    {
+        if (original == null)
+            return;
+
+        // base fields
+        target.Label = original.Label;
+        target.HintDescription = original.HintDescription;
+
+        // type specific restore
+        switch (target)
+        {
+            case SSButton btn when original is SSButton ob:
+                btn.ButtonText = ob.ButtonText;
+                break;
+            case SSSliderSetting sl when original is SSSliderSetting os:
+                sl.MinValue = os.MinValue;
+                sl.MaxValue = os.MaxValue;
+                sl.Integer = os.Integer;
+                sl.ValueToStringFormat = os.ValueToStringFormat;
+                sl.FinalDisplayFormat = os.FinalDisplayFormat;
+                break;
+            case SSDropdownSetting dd when original is SSDropdownSetting od:
+                dd.Options = od.Options;
+                dd.DefaultOptionIndex = od.DefaultOptionIndex;
+                break;
+            case SSTwoButtonsSetting ab when original is SSTwoButtonsSetting oa:
+                ab.OptionA = oa.OptionA;
+                ab.OptionB = oa.OptionB;
+                ab.DefaultIsB = oa.DefaultIsB;
+                break;
+            case SSPlaintextSetting tb when original is SSPlaintextSetting ot:
+                tb.CharacterLimit = ot.CharacterLimit;
+                tb.ContentType = ot.ContentType;
+                tb.Placeholder = ot.Placeholder;
+                break;
+            case SSKeybindSetting kb when original is SSKeybindSetting ok:
+                kb.SuggestedKey = ok.SuggestedKey;
+                kb.AssignedKeyCode = ok.AssignedKeyCode;
+                break;
         }
     }
 
@@ -113,10 +154,10 @@ internal class MenuEvents : CustomEventsHandler
         {
             Menu currentMenu = hub.GetCurrentMenu();
 
-            MenuState[hub] = (isOpen, currentMenu is KeybindMenu ? state.LastMenu : currentMenu);
+            MenuState[hub] = (isOpen, currentMenu is GlobalMenu ? state.LastMenu : currentMenu);
 
-            if (currentMenu is not KeybindMenu)
-                hub.LoadMenu(new KeybindMenu());
+            if (currentMenu is not GlobalMenu)
+                hub.LoadMenu(new GlobalMenu());
         }
         else
         {

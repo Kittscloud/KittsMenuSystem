@@ -1,12 +1,10 @@
 ﻿using KittsMenuSystem.Examples;
 using KittsMenuSystem.Features.Settings;
-using MEC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UserSettings.ServerSpecific;
-using static UnityEngine.Rendering.RayTracingAccelerationStructure;
 
 namespace KittsMenuSystem.Features.Menus;
 
@@ -20,19 +18,24 @@ public static class MenuManager
     public static IReadOnlyDictionary<ReferenceHub, Menu> SyncedMenus => _syncedMenus;
 
     #region Registering
-
     private readonly static List<Menu> _registeredMenus = [];
-    private readonly static Dictionary<Assembly, List<TextArea>> _pinned = [];
-    
+    private readonly static Dictionary<Assembly, List<BaseSetting>> _pinnedTopSettings = [];
+    private readonly static Dictionary<Assembly, List<BaseSetting>> _pinnedBottomSettings = [];
+
     /// <summary>
     /// Contains all loaded <see cref="Menu"/>s.
     /// </summary>
     public static IReadOnlyList<Menu> RegisteredMenus => _registeredMenus;
 
     /// <summary>
-    /// Contains <see cref="Assembly"/> with their pins.
+    /// Contains <see cref="Assembly"/> with their top pinned settings.
     /// </summary>
-    public static IReadOnlyDictionary<Assembly, List<TextArea>> Pinned => _pinned;
+    public static IReadOnlyDictionary<Assembly, List<BaseSetting>> PinnedTopSettings => _pinnedTopSettings;
+
+    /// <summary>
+    /// Contains <see cref="Assembly"/> with their top pinned settings.
+    /// </summary>
+    public static IReadOnlyDictionary<Assembly, List<BaseSetting>> PinnedBottomSettings => _pinnedBottomSettings;
 
     private static readonly Queue<Assembly> _waitingAssemblies = new();
 
@@ -72,9 +75,8 @@ public static class MenuManager
                 .Where(t => t.BaseType == typeof(Menu) &&
                     !t.IsAbstract &&
                     !t.IsInterface &&
-                    t != typeof(AssemblyMenu) &&
                     t != typeof(CentralMainMenu) &&
-                    t != typeof(KeybindMenu) &&
+                    t != typeof(GlobalMenu) &&
                     (t != typeof(MainExample) || KittsMenuSystem.Config.EnableExamples))
                 .Select(t => Activator.CreateInstance(t) as Menu)];
 
@@ -121,7 +123,7 @@ public static class MenuManager
             if (menu.Id == 0)
                 throw new ArgumentException("Menu ID cannot be 0 (reserved for Main Menu)");
             if (menu.Id == 1)
-                throw new ArgumentException("Menu ID cannot be 1 (reserved for Keybinds Menu)");
+                throw new ArgumentException("Menu ID cannot be 1 (reserved for Global Menu)");
             if (string.IsNullOrEmpty(menu.Name))
                 throw new ArgumentException("Menu name cannot be empty");
             if (_registeredMenus.Any(m => m.Name == menu.Name))
@@ -188,47 +190,29 @@ public static class MenuManager
     }
 
     /// <summary>
-    /// Register <see cref="ServerSpecificSettingBase"/> displayed on the top of all menus.
+    /// Register list of <see cref="BaseSetting"/>s displayed on the top of all menus.
     /// </summary>
     /// <param name="toPin">The list of <see cref="ServerSpecificSettingBase"/> to pin.</param>
-    public static void RegisterPins(this List<TextArea> toPin) => _pinned[Assembly.GetCallingAssembly()] = toPin;
+    public static void RegisterTopPinnedSettings(this List<BaseSetting> toPin) => _pinnedTopSettings[Assembly.GetCallingAssembly()] = toPin;
 
     /// <summary>
-    /// Remove registered pins from <see cref="Assembly.GetCallingAssembly"/>.
+    /// Remove top pinnedsettings  from <see cref="Assembly.GetCallingAssembly"/>.
     /// </summary>
-    public static void UnregisterAllPins() => _pinned.Remove(Assembly.GetCallingAssembly());
+    public static void UnregisterTopPinnedSettings() => _pinnedTopSettings.Remove(Assembly.GetCallingAssembly());
+
+    /// <summary>
+    /// Register list of <see cref="BaseSetting"/>s displayed on the bomttom of all menus.
+    /// </summary>
+    /// <param name="toPin">The list of <see cref="ServerSpecificSettingBase"/> to pin.</param>
+    public static void RegisterBottomPinnedSettings(this List<BaseSetting> toPin) => _pinnedBottomSettings[Assembly.GetCallingAssembly()] = toPin;
+
+    /// <summary>
+    /// Remove bottom pinned settings from <see cref="Assembly.GetCallingAssembly"/>.
+    /// </summary>
+    public static void UnregisterBottomPinnedSettings() => _pinnedBottomSettings.Remove(Assembly.GetCallingAssembly());
     #endregion
 
-    #region Menu Utils
-    /// <summary>
-    /// Loaded <see cref="ReferenceHub"/> menu.
-    /// </summary>
-    /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
-    /// <returns><see cref="Menu"/> if <see cref="ReferenceHub"/> opens a menu, null if on the main menu.</returns>
-    public static Menu GetCurrentMenu(this ReferenceHub hub) => _syncedMenus.TryGetValue(hub, out Menu menu) ? menu : null;
-
-    /// <summary>
-    /// Get a menu by <see cref="Type"/>.
-    /// </summary>
-    /// <param name="type">The type</param>
-    /// <returns><see cref="Menu"/> (If Found).</returns>
-    public static Menu GetMenu(this Type type) => _registeredMenus.FirstOrDefault(x => x.GetType() == type);
-
-    internal static AssemblyMenu GetMenu(Assembly assembly) => _registeredMenus.OfType<AssemblyMenu>().FirstOrDefault(x => x.Assembly == assembly);
-
-    /// <summary>
-    /// Reload current <see cref="Menu"/> for <see cref="ReferenceHub"/>.
-    /// </summary>
-    /// <param name="hub">The target <see cref="ReferenceHub"/>.</param>
-    public static void ReloadCurrentMenu(this ReferenceHub hub) => hub.LoadMenu(hub.GetCurrentMenu());
-
-    /// <summary>
-    /// Reload current <see cref="Menu"/> for all <see cref="ReferenceHub"/>s.
-    /// </summary>
-    public static void ReloadAll() { foreach (ReferenceHub hub in ReferenceHub.AllHubs) hub.ReloadCurrentMenu(); }
-    #endregion
-
-    #region Sending Menu
+    #region Loading Menu
     /// <summary>
     /// Load <see cref="Menu"/> for <see cref="ReferenceHub"/>.
     /// Null loads main menu.
@@ -252,7 +236,8 @@ public static class MenuManager
 
             Log.Debug("MenuManager.LoadMenu", mainMenus.Count == 1
                 ? $"Triggered the only main menu: {menu.Name}."
-                : $"Built central main menu with {mainMenus.Count} submenus for {hub.nicknameSync.DisplayName}");
+                : $"Built central main menu with {mainMenus.Count} submenus for {hub.nicknameSync.DisplayName}"
+            );
         }
 
         if (!menu.CheckAccess(hub))
@@ -261,13 +246,10 @@ public static class MenuManager
             return [];
         }
 
-        List<BaseSetting> settings = menu.GetSettings(hub);
+        List<BaseSetting> settings = menu.GetSettings(hub, true, true);
         _syncedMenus[hub] = menu;
 
-        if (menu is not CentralMainMenu and not KeybindMenu && !menu.SyncedSettings.ContainsKey(hub))
-            Timing.RunCoroutine(hub.SyncMenu(menu));
-        else
-            hub.SendSettings(settings);
+        hub.SendSettings(settings);
 
         menu.OnOpen(hub);
 
@@ -276,7 +258,6 @@ public static class MenuManager
 
     /// <summary>
     /// Send settings to target <see cref="ReferenceHub"/>.
-    /// Only used for Main Menu.
     /// </summary>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
     /// <param name="settings">List of <see cref="BaseSetting"/> to send.</param>
@@ -291,129 +272,30 @@ public static class MenuManager
     }
     #endregion
 
-    #region Syncing Menus
-    internal static readonly Dictionary<ReferenceHub, List<ServerSpecificSettingBase>> SyncCache = [];
-
+    #region Menu Utils
     /// <summary>
-    /// Get a <see cref="ServerSpecificSettingBase"/> by Id for a hub using a menu of type <typeparamref name="TMenu"/>.
+    /// Loaded <see cref="ReferenceHub"/> menu.
     /// </summary>
-    /// <typeparam name="TMenu">Target menu type.</typeparam>
-    /// <typeparam name="TSetting">Target SS setting type, must inherit <see cref="ServerSpecificSettingBase"/>.</typeparam>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
-    /// <param name="settingId">ID of the setting.</param>
-    /// <returns>The matching <see cref="ServerSpecificSettingBase"/> or null if not found.</returns>
-    public static TSetting GetSetting<TMenu, TSetting>(this ReferenceHub hub, int settingId)
-        where TMenu : Menu
-        where TSetting : ServerSpecificSettingBase
-    {
-        if (typeof(TSetting).BaseType == typeof(BaseSetting))
-        {
-            Log.Error("MenuManager.GetSetting", $"{nameof(TSetting)} needs to be of base type");
-            return null;
-        }
-
-        foreach (Menu menu in _registeredMenus.Where(m => m is TMenu))
-        {
-            if (!menu.BuiltSettings.TryGetValue(hub, out List<BaseSetting> settings))
-            {
-                Log.Debug("MenuManager.GetSetting", $"No synced settings for hub {hub.nicknameSync.DisplayName} in menu {menu.Name} ({menu.Id})");
-                continue;
-            }
-
-            ServerSpecificSettingBase t = settings
-                .Select(b => b.Base)
-                .Where(s => s is TSetting)
-                .FirstOrDefault(s => 
-                    s.SettingId == settingId || 
-                    s.SettingId - menu.Hash == settingId
-                );
-
-            return t as TSetting;
-        }
-
-        Log.Warn("MenuManager.GetSetting", $"Failed to find setting of type {typeof(TSetting).Name} ({settingId}) for hub {hub.nicknameSync.DisplayName}");
-        return null;
-    }
+    /// <returns><see cref="Menu"/> if <see cref="ReferenceHub"/> opens a menu, null if on the main menu.</returns>
+    public static Menu GetCurrentMenu(this ReferenceHub hub) => _syncedMenus.TryGetValue(hub, out Menu menu) ? menu : null;
 
     /// <summary>
-    /// Sync settings from a single menu for a ReferenceHub.
+    /// Get a menu by <see cref="Type"/>.
     /// </summary>
-    internal static IEnumerator<float> SyncMenu(this ReferenceHub hub, Menu menu)
-    {
-        if (!menu.CheckAccess(hub))
-        {
-            Log.Debug("MenuManager.SyncMenu", $"{hub.nicknameSync.DisplayName} has no access to {menu.Name}");
-            yield break;
-        }
-
-        List<BaseSetting> sendSettings = [.. menu.Settings(hub).Where(bs => bs.Base.ResponseMode == ServerSpecificSettingBase.UserResponseMode.AcquisitionAndChange)];
-
-        hub.SendSettings(sendSettings);
-
-        float timeout = 0f;
-        const float timeoutLimit = 10f;
-        const float waitTime = 0.01f;
-
-        while (SyncCache[hub].Count < sendSettings.Count && timeout < timeoutLimit)
-        {
-            timeout += waitTime;
-            yield return waitTime;
-        }
-
-        if (SyncCache[hub].Count < sendSettings.Count)
-        {
-            Log.Error("MenuManager.SyncMenu", $"Timeout syncing {hub.nicknameSync.DisplayName} on {menu.Name}");
-            yield break;
-        }
-
-        // Map synced ServerSpecificSettingBase back into BaseSetting
-        List<BaseSetting> syncedWrapped = [.. menu.GetSettings(hub)
-            .Select(bs =>
-            {
-                ServerSpecificSettingBase synced = SyncCache[hub].FirstOrDefault(x => x.SettingId == bs.Base.SettingId);
-                if (synced != null) bs.Base = synced;
-                return bs;
-            })
-            .Where(bs => bs.Base != null)];
-
-        menu.SyncedSettings[hub] = syncedWrapped;
-
-        Log.Debug("MenuManager.SyncMenu", $"Synced {syncedWrapped.Count} settings for {hub.nicknameSync.DisplayName} in {menu.Name}");
-
-        sendSettings.Clear();
-        SyncCache[hub].Clear();
-
-        hub.LoadMenu(new KeybindMenu());
-
-        MenuEvents.MenuState[hub] = (false, null);
-    }
+    /// <param name="type">The type</param>
+    /// <returns><see cref="Menu"/> (If Found).</returns>
+    public static Menu GetMenu(this Type type) => _registeredMenus.FirstOrDefault(x => x.GetType() == type);
 
     /// <summary>
-    /// Sync settings for all accessible menus for a ReferenceHub.
+    /// Reload current <see cref="Menu"/> for <see cref="ReferenceHub"/>.
     /// </summary>
-    internal static IEnumerator<float> SyncAllMenus(this ReferenceHub hub)
-    {
-        SyncCache.Add(hub, []);
+    /// <param name="hub">The target <see cref="ReferenceHub"/>.</param>
+    public static void ReloadCurrentMenu(this ReferenceHub hub) => hub.LoadMenu(hub.GetCurrentMenu());
 
-        List<Menu> accessibleMenus = [.. _registeredMenus.Where(m => m.CheckAccess(hub))];
-        if (!accessibleMenus.Any())
-        {
-            Log.Warn("MenuManager.SyncAllMenus", $"No accessible menus for {hub.nicknameSync.DisplayName}");
-            yield break;
-        }
-
-        for (int i = 0; i < accessibleMenus.Count; i++)
-        {
-            Menu menu = accessibleMenus[i];
-            bool isLast = i == accessibleMenus.Count - 1;
-
-            IEnumerator<float> enumerator = hub.SyncMenu(menu);
-            while (enumerator.MoveNext())
-                yield return enumerator.Current;
-        }
-
-        // Cleanup
-        SyncCache.Remove(hub);
-    }
+    /// <summary>
+    /// Reload current <see cref="Menu"/> for all <see cref="ReferenceHub"/>s.
+    /// </summary>
+    public static void ReloadAll() { foreach (ReferenceHub hub in ReferenceHub.AllHubs) hub.ReloadCurrentMenu(); }
     #endregion
 }

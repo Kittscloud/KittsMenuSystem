@@ -16,6 +16,11 @@ public abstract class Menu
     public abstract string Name { get; set; }
 
     /// <summary>
+    /// Gets Hash of menu based on <see cref="Name"/>. Used to seperate menu settings.
+    /// </summary>
+    public int Hash => Mathf.Abs(Name.GetHashCode() % 100000);
+
+    /// <summary>
     /// Gets or sets the id of Menu (Must be greater than 0).
     /// </summary>
     public abstract int Id { get; set; }
@@ -59,9 +64,9 @@ public abstract class Menu
 
     #region Settings
     /// <summary>
-    /// Synced settings for a specified <see cref="ReferenceHub"/>.
+    /// Original definitions for built settings.
     /// </summary>
-    internal Dictionary<ReferenceHub, List<BaseSetting>> SyncedSettings { get; } = [];
+    internal Dictionary<int, ServerSpecificSettingBase> DefinitionCache { get; } = [];
 
     /// <summary>
     /// Built settings per <see cref="ReferenceHub"/> for this menu.
@@ -69,103 +74,201 @@ public abstract class Menu
     internal Dictionary<ReferenceHub, List<BaseSetting>> BuiltSettings { get; } = [];
 
     /// <summary>
-    /// Gets the settings to display for a given <see cref="ReferenceHub"/> in this menu.
+    /// Gets built settings for a given <see cref="ReferenceHub"/> in this menu.
+    /// </summary>
+    /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
+    /// <param name="callSettings">Should function call settings.</param>
+    /// <param name="rebuildSettings">Should function rebuild settings.</param>
+    /// <returns>List of built <see cref="BaseSetting"/>s.</returns>
+    internal List<BaseSetting> GetSettings(ReferenceHub hub, bool callSettings, bool rebuildSettings)
+    {
+        if (!BuiltSettings.TryGetValue(hub, out List<BaseSetting> settings))
+            settings = BuildSettings(hub);
+
+        if (callSettings)
+            Settings(hub);
+
+        if (rebuildSettings)
+            RebuildSettings(hub);
+
+        Log.Debug("Menu.GetSettings", $"Got {settings.Count} settings for {hub.nicknameSync.DisplayName} in {Name} ({Id})");
+
+        return settings;
+    }
+
+    /// <summary>
+    /// Builds the settings to display for a given <see cref="ReferenceHub"/>.
+    /// </summary>
+    /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
+    /// <returns>List of <see cref="BaseSetting"/>s built.</returns>
+    private List<BaseSetting> BuildSettings(ReferenceHub hub)
+    {
+        Log.Debug("Menu.BuildSettings", $"Building settings for {hub.nicknameSync.DisplayName}");
+
+        List<BaseSetting> built = GenerateSettings(hub);
+
+        BuiltSettings[hub] = built;
+
+        foreach (BaseSetting s in built)
+            DefinitionCache[s.Base.SettingId] = s.Base;
+
+        Log.Debug("Menu.BuildSettings", $"Built {built.Count} settings for {hub.nicknameSync.DisplayName}");
+
+        return built;
+    }
+
+    /// <summary>
+    /// Rebuilds settings for a hub, keeping already-built settings and adding new ones.
+    /// </summary>
+    /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
+    /// <returns>List of <see cref="BaseSetting"/>s rebuilt.</returns>
+    private List<BaseSetting> RebuildSettings(ReferenceHub hub)
+    {
+        Log.Debug("Menu.RebuildSettings", $"Rebuilding settings for {hub.nicknameSync.DisplayName}");
+
+        BuiltSettings.TryGetValue(hub, out List<BaseSetting> existing);
+        existing ??= [];
+
+        List<BaseSetting> generated = GenerateSettings(hub);
+
+        Dictionary<int, BaseSetting> existingMap = existing.ToDictionary(s => s.SettingId, s => s);
+
+        List<BaseSetting> rebuilt = [];
+
+        foreach (BaseSetting gen in generated)
+        {
+            if (existingMap.TryGetValue(gen.SettingId, out BaseSetting old))
+                rebuilt.Add(old);
+            else
+                rebuilt.Add(gen);
+        }
+
+        BuiltSettings[hub] = rebuilt;
+
+        foreach (BaseSetting s in rebuilt)
+            DefinitionCache[s.Base.SettingId] = s.Base;
+
+        Log.Debug("Menu.RebuildSettings", $"Rebuilt {rebuilt.Count} settings for {hub.nicknameSync.DisplayName}");
+
+        return rebuilt;
+    }
+
+    /// <summary>
+    /// Generate the settings to display for a given <see cref="ReferenceHub"/> in this menu.
     /// Includes _pinned content, return/submenu buttons, headers, and any hub-specific overrides.
     /// </summary>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
-    /// <returns>List of <see cref="ServerSpecificSettingBase"/> to send to the client.</returns>
-    internal List<BaseSetting> GetSettings(ReferenceHub hub)
+    /// <returns>List of <see cref="BaseSetting"/>s generated.</returns>
+    private List<BaseSetting> GenerateSettings(ReferenceHub hub)
     {
-        Log.Debug("Menu.GetSettings", $"Generating settings for {hub.nicknameSync.DisplayName} in {Name} ({Id})");
-
         List<BaseSetting> settings = [];
 
-        // Add _pinned textareas
-        settings.AddRange(MenuManager.Pinned.Values.SelectMany(s => s));
-        if (!MenuManager.Pinned.Values.IsEmpty()) Log.Debug("Menu.GetSettings", $"Added {MenuManager.Pinned.Values.Count()} _pinned settings for {hub.nicknameSync.DisplayName}");
+        settings.AddRange(MenuManager.PinnedTopSettings.Values.SelectMany(p => p));
 
         if (ParentMenu != null)
         {
-            Log.Debug("Menu.GetSettings", $"{Name} ({Id}) has a parent menu");
-
             settings.Add(new Button(
                 string.Format(KittsMenuSystem.Config.Translation.ReturnTo.Label, MenuManager.GetMenu(ParentMenu)?.Name ?? "Unknown"),
-                KittsMenuSystem.Config.Translation.ReturnTo.ButtonText, (h, _) => h.LoadMenu(ParentMenu.GetMenu())
+                KittsMenuSystem.Config.Translation.ReturnTo.ButtonText,
+                (h, _) => h.LoadMenu(ParentMenu.GetMenu())
             ));
-
-            Log.Debug("Menu.GetSettings", $"Added button returning to {ParentMenu.GetMenu().Name} ({ParentMenu.GetMenu().Id}) for {hub.nicknameSync.DisplayName}");
         }
-        else if (ParentMenu == null && GetType() != typeof(CentralMainMenu) && GetType() != typeof(KeybindMenu) && MenuManager.RegisteredMenus.Count(m => m.CheckAccess(hub) && m.ParentMenu == null) > 1)
+        else if (ParentMenu == null &&
+            GetType() != typeof(CentralMainMenu) &&
+            GetType() != typeof(GlobalMenu) &&
+            MenuManager.RegisteredMenus.Count(m => m.CheckAccess(hub) && m.ParentMenu == null) > 1)
         {
-            Log.Debug("Menu.GetSettings", $"{Name} ({Id}) is one of the main menus");
-
             settings.Add(new Button(
                 string.Format(KittsMenuSystem.Config.Translation.ReturnTo.Label, "Main Menu"),
-                KittsMenuSystem.Config.Translation.ReturnTo.ButtonText, (h, _) => h.LoadMenu(null)
+                KittsMenuSystem.Config.Translation.ReturnTo.ButtonText,
+                (h, _) => h.LoadMenu(null)
             ));
-
-            Log.Debug("Menu.GetSettings", $"Added button returning to main menu for {hub.nicknameSync.DisplayName}");
         }
 
         List<Menu> subMenus = [.. MenuManager.RegisteredMenus.Where(m => m.CheckAccess(hub) && m.ParentMenu == GetType())];
 
         if (!subMenus.IsEmpty())
         {
-            Log.Debug("Menu.GetSettings", $"{Name} ({Id}) has submenu(s)");
-
             settings.Add(new GroupHeader("Sub Menu(s)"));
-
             foreach (Menu subMenu in subMenus)
-            {
                 settings.Add(new Button(
                     string.Format(KittsMenuSystem.Config.Translation.OpenMenu.Label, subMenu.Name),
-                    KittsMenuSystem.Config.Translation.OpenMenu.ButtonText, (h, _) => h.LoadMenu(subMenu)
+                    KittsMenuSystem.Config.Translation.OpenMenu.ButtonText,
+                    (h, _) => h.LoadMenu(subMenu)
                 ));
-
-                Log.Debug("Menu.GetSettings", $"Added sub menu button going to {subMenu.Name} ({subMenu.Id}) for {hub.nicknameSync.DisplayName}");
-            }
         }
 
         settings.Add(new GroupHeader(Name));
-        Log.Debug("Menu.GetSettings", $"Added main header of {Name} ({Id}) for {hub.nicknameSync.DisplayName}");
-
-        // AssemblyMenu hub-specific overrides
-        if (this is AssemblyMenu assemblyMenu && assemblyMenu.ActuallySentToClient.TryGetValue(hub, out List<BaseSetting> overrideSettings) && overrideSettings != null)
-        {
-            if (overrideSettings.Count == 0) settings.RemoveAt(settings.Count - 1); // Remove footer if empty
-            settings.AddRange(overrideSettings);
-            Log.Debug("Menu.GetSettings", $"Applied {overrideSettings.Count} assembly menu override settings for {hub.nicknameSync.DisplayName}");
-            return settings;
-        }
-
         settings.AddRange(Settings(hub));
 
-		Dictionary<int, BaseSetting> seenIds = [];
-        List<BaseSetting> filteredSettings = [];
+        settings.AddRange(MenuManager.PinnedBottomSettings.Values.SelectMany(p => p));
+
+        Dictionary<int, BaseSetting> seen = [];
+        List<BaseSetting> final = [];
 
         foreach (BaseSetting setting in settings)
         {
-            // Hash setting with menu to avoid other settings from other menus colliding
-            if (GetType() != typeof(KeybindMenu))
-            {
+            if (GetType() != typeof(GlobalMenu))
                 setting.SettingId += Hash;
-                Log.Debug("Menu.GetSettings", $"Hashed {setting.GetType().Name} ({setting.Base.SettingId}) with {Hash}, new Id: {setting.SettingId}");
-            }
 
-            if (seenIds.ContainsKey(setting.SettingId))
-            {
-                Log.Warn("Menu.GetSettings", $"Skipping duplicate {setting.GetType().Name} ({setting.SettingId}) in {Name} ({Id}) for {hub.nicknameSync.DisplayName}");
+            if (seen.ContainsKey(setting.SettingId))
                 continue;
-            }
 
-            seenIds[setting.SettingId] = setting;
-            filteredSettings.Add(setting);
+            seen[setting.SettingId] = setting;
+            final.Add(setting);
         }
 
-        Log.Debug("Menu.GetSettings", $"Finalized {settings.Count} settings on {Name} ({Id}) for {hub.nicknameSync.DisplayName}");
+        return final;
+    }
 
-        BuiltSettings[hub] = filteredSettings;
-        return filteredSettings;
+    /// <summary>
+    /// Get a <see cref="ServerSpecificSettingBase"/> by Id for a hub.
+    /// </summary>
+    /// <typeparam name="TSetting">Target SS setting type, must inherit <see cref="BaseSetting"/>.</typeparam>
+    /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
+    /// <param name="settingId">ID of the setting.</param>
+    /// <returns>The matching <see cref="ServerSpecificSettingBase"/> or null if not found.</returns>
+    public TSetting GetSetting<TSetting>(ReferenceHub hub, int settingId)
+        where TSetting : ServerSpecificSettingBase
+    {
+        if (typeof(TSetting).BaseType == typeof(BaseSetting))
+        {
+            Log.Error("MenuManager.GetSetting", $"{nameof(TSetting)} needs to be of base type");
+            return null;
+        }
+
+        ServerSpecificSettingBase t = BuiltSettings.Values
+            .SelectMany(l => l)
+            .Select(b => b.Base)
+            .OfType<TSetting>()
+            .FirstOrDefault(s =>
+                s.SettingId == settingId ||
+                s.SettingId - Hash == settingId
+            );
+
+        if (t == null)
+        {
+            Log.Warn("MenuManager.GetSetting", $"Failed to find setting of type {typeof(TSetting).Name} ({settingId}) for hub {hub.nicknameSync.DisplayName}, returning dummy");
+
+            static ServerSpecificSettingBase CreateDummy<DSetting>() where DSetting : ServerSpecificSettingBase
+            {
+                Type t = typeof(TSetting);
+
+                if (t == typeof(SSButton)) return new SSButton(int.MinValue, "", "");
+                if (t == typeof(SSDropdownSetting)) return new SSDropdownSetting(int.MinValue, "", []);
+                if (t == typeof(SSSliderSetting)) return new SSSliderSetting(int.MinValue, "", 0, 1);
+                if (t == typeof(SSTwoButtonsSetting)) return new SSTwoButtonsSetting(int.MinValue, "", "A", "B");
+                if (t == typeof(SSPlaintextSetting)) return new SSPlaintextSetting(int.MinValue, "");
+                if (t == typeof(SSTextArea)) return new SSTextArea(int.MinValue, "");
+                if (t == typeof(SSKeybindSetting)) return new SSKeybindSetting(int.MinValue, "");
+
+                throw new Exception($"Unknown setting type: {t.Name}");
+            }
+
+            return CreateDummy<TSetting>() as TSetting;
+        }
+
+        return t as TSetting;
     }
     #endregion
 
@@ -182,12 +285,7 @@ public abstract class Menu
     public void ReloadForAll()
     {
         foreach (ReferenceHub hub in MenuManager.SyncedMenus.Where(x => x.Value == this).Select(x => x.Key).ToList())
-            hub.LoadMenu(this);
+            ReloadFor(hub);
     }
     #endregion
-
-    /// <summary>
-    /// Gets Hash of menu based on <see cref="Name"/>. Used to seperate menu settings.
-    /// </summary>
-    public int Hash => Mathf.Abs(Name.GetHashCode() % 100000);
 }

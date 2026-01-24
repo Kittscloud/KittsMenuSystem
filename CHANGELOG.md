@@ -1,5 +1,37 @@
 # KittsMenuSystem Changelog
 
+## Version 0.4.0
+- Added `BuildSettings` function - Used to build original settings.
+- Added `RebuildSettings` function - Used to rebuild the settings.
+- Added `GenerateSettings` function - Used to generate settings to be built.
+- Added `DefinitionCache` - Used to store original definitions.
+- Added `OriginalDefinition` patch - Used to get the GetOriginalDefinitio stored in the `DefinitionCache`.
+- Added `RestoreFromOriginal` function - Used to store original definition when `OnSettingReceived` is called.
+- Added `GlobalMenu` - Loaded when settings are closed and conatins all settings from all menus.
+- Added `PinnedTopSettings` - List of `BaseSetting` pinned to the top of all menus.
+- Added `PinnedBottomSettings` - List of `BaseSetting` pinned to the bottom of all menus.
+- Added `RegisterTopPinnedSettings` function - Registers the `PinnedTopSettings`.
+- Added `UnregisterTopPinnedSettings` function - Unregisters the `PinnedTopSettings`.
+- Added `RegisterBottomPinnedSettings` function - Registers the `PinnedBottomSettings`.
+- Added `UnregisterBottomPinnedSettings` function - Unregisters the `PinnedBottomSettings`.
+- Updated `GetSetting` function - Moved to `Menu.cs`, is per menu and returns a dummy setting if null.
+- Updated `GetSettings` function - Now returns `BuiltSettings`, populating if empty, with options to rebuild and call settings.
+- Removed `Pinned` - Moved to `PinnedTopSettings` and `PinnedBottomSettings`.
+- Removed `RegisterPins` - Moved to `RegisterTopPinnedSettings` and `RegisterBottomPinnedSettings`.
+- Removed `UnregisterAllPins` - Moved to `UnregisterTopPinnedSettings` and `UnregisterBottomPinnedSettings`.
+- Removed `LockedAssembly` - No longer needed.
+- Removed `Load` function - No longer needed.
+- Removed `SyncMenu` function - No longer needed.
+- Removed `SyncAllMenus` function - No longer needed.
+- Removed `Wrap` function - No longer needed.
+- Removed `KeybindMenu` - No longer needed.
+- Removed `SyncCache` - No longer needed.
+- Removed `SetDefinedSettings` patch - No longer needed.
+- Removed `GetDefinedSettings` patch - No longer needed.
+- Removed `SendToPlayer` patch - No longer needed.
+- Removed `SendToPlayer` patch - No longer needed.
+- Removed `PlaintextLimit` patch function - No longer needed.
+
 ## Version 0.3.4
 - Fixed `GetSetting` function - Fixed a bug where function could not find setting while SSSetting was in the unhashed state.
 
@@ -36,7 +68,7 @@
 - Updated `Wrappers` - Updated all `Wrappers` to use `BaseSetting`. 
 - Updated `SettingSync` - Now named `SyncedSettings`, list of `BaseSetting` and set to `internal`.
 - Updated `MenuRelated` - Now named `ParentMenu`.
-- Updated `SentSettings` - Now named `BuiltSettings`, list of `BaseSetting`.
+- Updated `SentSettings` - Now named `BuiltSettings` and is a list of `BaseSetting`.
 - Updated `GetSettings` fucntion - Now builds pins, buttons and settings as `BaseSetting`.
 - Updated `ProperlyEnable` fucntion - Now named `OnOpen`
 - Updated `ProperlyDisable` fucntion - Now named `OnClose`
