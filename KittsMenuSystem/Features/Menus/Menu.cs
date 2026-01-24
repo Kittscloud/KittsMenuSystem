@@ -82,13 +82,14 @@ public abstract class Menu
     /// <returns>List of built <see cref="BaseSetting"/>s.</returns>
     internal List<BaseSetting> GetSettings(ReferenceHub hub, bool callSettings, bool rebuildSettings)
     {
-        if (!BuiltSettings.TryGetValue(hub, out List<BaseSetting> settings))
-            settings = BuildSettings(hub);
+        BuiltSettings.TryGetValue(hub, out List<BaseSetting> settings);
+        settings ??= BuildSettings(hub);
+
+        if (!rebuildSettings && callSettings)
+            Settings(hub);
 
         if (rebuildSettings)
-            RebuildSettings(hub);
-        else if (callSettings)
-            Settings(hub);
+            settings = RebuildSettings(hub);
 
         Log.Debug("Menu.GetSettings", $"Got {settings.Count} settings for {hub.nicknameSync.DisplayName} in {Name} ({Id})");
 
@@ -126,13 +127,12 @@ public abstract class Menu
         Log.Debug("Menu.RebuildSettings", $"Rebuilding settings for {hub.nicknameSync.DisplayName}");
 
         BuiltSettings.TryGetValue(hub, out List<BaseSetting> existing);
-        existing ??= [];
-
-        List<BaseSetting> generated = GenerateSettings(hub);
+        existing ??= BuildSettings(hub);
 
         Dictionary<int, BaseSetting> existingMap = existing.ToDictionary(s => s.SettingId, s => s);
 
-        List<BaseSetting> rebuilt = [];
+        List<BaseSetting> generated = GenerateSettings(hub);
+        List<BaseSetting> rebuilt = new(generated.Count);
 
         foreach (BaseSetting gen in generated)
         {

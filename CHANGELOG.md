@@ -1,5 +1,9 @@
 # KittsMenuSystem Changelog
 
+## Version 0.4.2
+- Fixed `GetSettings` function - Fixed a bug where function was not returning the rebuilt settings.
+- Fixed `RebuildSettings` function - Fixed a bug where function was not rebuilding settings correctly.
+
 ## Version 0.4.1
 - Updated `GetSetting` function - Moved to `MenuManager.cs`, takes `Menu` type, returns `ServerSpecificSettingBase` or `BaseSetting` and defaults to dummy setting if null.
 - Updated `Button` function - `isPressed` action set to null by default.

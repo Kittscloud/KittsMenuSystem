@@ -1,14 +1,10 @@
 ﻿using KittsMenuSystem.Examples;
 using KittsMenuSystem.Features.Settings;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Policy;
 using UserSettings.ServerSpecific;
-using UserSettings.UserInterfaceSettings;
-using static UnityEngine.Rendering.RayTracingAccelerationStructure;
 
 namespace KittsMenuSystem.Features.Menus;
 
@@ -223,8 +219,7 @@ public static class MenuManager
     /// </summary>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
     /// <param name="menu">Target <see cref="Menu"/>.</param>
-    /// <returns>List of <see cref="BaseSetting"/> that was loaded</returns>
-    internal static List<BaseSetting> LoadMenu(this ReferenceHub hub, Menu menu)
+    internal static void LoadMenu(this ReferenceHub hub, Menu menu)
     {
         hub.GetCurrentMenu()?.OnClose(hub);
 
@@ -247,7 +242,7 @@ public static class MenuManager
         if (!menu.CheckAccess(hub))
         {
             Log.Warn("MenuManager.LoadMenu", $"{hub.nicknameSync.DisplayName} tried loading {menu.Name} without access");
-            return [];
+            return;
         }
 
         List<BaseSetting> settings = menu.GetSettings(hub, true, true);
@@ -256,8 +251,6 @@ public static class MenuManager
         hub.SendSettings(settings);
 
         menu.OnOpen(hub);
-
-        return settings;
     }
 
     /// <summary>
@@ -367,6 +360,6 @@ public static class MenuManager
     /// <summary>
     /// Reload current <see cref="Menu"/> for all <see cref="ReferenceHub"/>s.
     /// </summary>
-    public static void ReloadAll() { foreach (ReferenceHub hub in ReferenceHub.AllHubs) hub.ReloadCurrentMenu(); }
+    public static void ReloadAll() { foreach (ReferenceHub hub in ReferenceHub.AllHubs.Where(h => h.isClient)) hub.ReloadCurrentMenu(); }
     #endregion
 }
