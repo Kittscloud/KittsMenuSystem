@@ -47,7 +47,7 @@ internal class UtilityExmaple : Menu
             //new GroupHeader("Abilities"),
             new Keybind("Speed Boost (Human-only)", (h, isPressed, _) =>
             {
-                bool toggleMode = GetSetting<SSTwoButtonsSetting>(h, 1).SyncIsB;
+                bool toggleMode = h.GetSetting<UtilityExmaple, SSTwoButtonsSetting>(1).SyncIsB;
 
                 if (toggleMode)
                 {
@@ -130,7 +130,7 @@ internal class UtilityExmaple : Menu
 
     private void ReloadColorInfoForUser(ReferenceHub hub) => (_selectedColorTextArea.Base as SSTextArea).SendTextUpdate(GetColorInfoForUser(hub), false, receiveFilter: (h) => h == hub);
     public string GetColorInfoForUser(ReferenceHub hub) => "Selected color: <color=" + GetColorInfo(hub).ToHex() + ">███████████</color>";
-    private Color GetColorInfo(ReferenceHub hub) => _presets[GetSetting<SSDropdownSetting>(hub, 4).SyncSelectionIndexRaw].Color;
+    private Color GetColorInfo(ReferenceHub hub) => _presets[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(4).SyncSelectionIndexRaw].Color;
 
     private void Spawn(ReferenceHub hub)
     {
@@ -138,12 +138,12 @@ internal class UtilityExmaple : Menu
         if (toy == null)
             return;
 
-        toy.Intensity = GetSetting<SSSliderSetting>(hub, 2).SyncFloatValue;
-        toy.Range = GetSetting<SSSliderSetting>(hub, 3).SyncFloatValue;
+        toy.Intensity = hub.GetSetting<UtilityExmaple, SSSliderSetting>(2).SyncFloatValue;
+        toy.Range = hub.GetSetting<UtilityExmaple, SSSliderSetting>(3).SyncFloatValue;
         toy.Color = GetColorInfo(hub);
-        toy.ShadowType = _shadowsType[GetSetting<SSDropdownSetting>(hub, 6).SyncSelectionIndexRaw];
-        toy.ShadowStrength = GetSetting<SSSliderSetting>(hub, 7).SyncFloatValue;
-        toy.Type = _lightType[GetSetting<SSDropdownSetting>(hub, 8).SyncSelectionIndexRaw];
+        toy.ShadowType = _shadowsType[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(6).SyncSelectionIndexRaw];
+        toy.ShadowStrength = hub.GetSetting<UtilityExmaple, SSSliderSetting>(7).SyncFloatValue;
+        toy.Type = _lightType[hub.GetSetting<UtilityExmaple, SSDropdownSetting>(8).SyncSelectionIndexRaw];
         toy.Transform.position = hub.transform.position;
 
         _spawnedToys.Add(toy);

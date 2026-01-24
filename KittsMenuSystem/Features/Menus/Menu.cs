@@ -85,11 +85,10 @@ public abstract class Menu
         if (!BuiltSettings.TryGetValue(hub, out List<BaseSetting> settings))
             settings = BuildSettings(hub);
 
-        if (callSettings)
-            Settings(hub);
-
         if (rebuildSettings)
             RebuildSettings(hub);
+        else if (callSettings)
+            Settings(hub);
 
         Log.Debug("Menu.GetSettings", $"Got {settings.Count} settings for {hub.nicknameSync.DisplayName} in {Name} ({Id})");
 
@@ -219,56 +218,6 @@ public abstract class Menu
         }
 
         return final;
-    }
-
-    /// <summary>
-    /// Get a <see cref="ServerSpecificSettingBase"/> by Id for a hub.
-    /// </summary>
-    /// <typeparam name="TSetting">Target SS setting type, must inherit <see cref="BaseSetting"/>.</typeparam>
-    /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
-    /// <param name="settingId">ID of the setting.</param>
-    /// <returns>The matching <see cref="ServerSpecificSettingBase"/> or null if not found.</returns>
-    public TSetting GetSetting<TSetting>(ReferenceHub hub, int settingId)
-        where TSetting : ServerSpecificSettingBase
-    {
-        if (typeof(TSetting).BaseType == typeof(BaseSetting))
-        {
-            Log.Error("MenuManager.GetSetting", $"{nameof(TSetting)} needs to be of base type");
-            return null;
-        }
-
-        ServerSpecificSettingBase t = BuiltSettings.Values
-            .SelectMany(l => l)
-            .Select(b => b.Base)
-            .OfType<TSetting>()
-            .FirstOrDefault(s =>
-                s.SettingId == settingId ||
-                s.SettingId - Hash == settingId
-            );
-
-        if (t == null)
-        {
-            Log.Warn("MenuManager.GetSetting", $"Failed to find setting of type {typeof(TSetting).Name} ({settingId}) for hub {hub.nicknameSync.DisplayName}, returning dummy");
-
-            static ServerSpecificSettingBase CreateDummy<DSetting>() where DSetting : ServerSpecificSettingBase
-            {
-                Type t = typeof(TSetting);
-
-                if (t == typeof(SSButton)) return new SSButton(int.MinValue, "", "");
-                if (t == typeof(SSDropdownSetting)) return new SSDropdownSetting(int.MinValue, "", []);
-                if (t == typeof(SSSliderSetting)) return new SSSliderSetting(int.MinValue, "", 0, 1);
-                if (t == typeof(SSTwoButtonsSetting)) return new SSTwoButtonsSetting(int.MinValue, "", "A", "B");
-                if (t == typeof(SSPlaintextSetting)) return new SSPlaintextSetting(int.MinValue, "");
-                if (t == typeof(SSTextArea)) return new SSTextArea(int.MinValue, "");
-                if (t == typeof(SSKeybindSetting)) return new SSKeybindSetting(int.MinValue, "");
-
-                throw new Exception($"Unknown setting type: {t.Name}");
-            }
-
-            return CreateDummy<TSetting>() as TSetting;
-        }
-
-        return t as TSetting;
     }
     #endregion
 

@@ -1,10 +1,14 @@
 ﻿using KittsMenuSystem.Examples;
 using KittsMenuSystem.Features.Settings;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Policy;
 using UserSettings.ServerSpecific;
+using UserSettings.UserInterfaceSettings;
+using static UnityEngine.Rendering.RayTracingAccelerationStructure;
 
 namespace KittsMenuSystem.Features.Menus;
 
@@ -273,6 +277,73 @@ public static class MenuManager
     #endregion
 
     #region Menu Utils
+    /// <summary>
+    /// Get a <see cref="BaseSetting"/> by Id for a hub from <typeparamref name="TMenu"/>.
+    /// </summary>
+    /// <typeparam name="TMenu">Target menu type.</typeparam>
+    /// <typeparam name="TSetting">Target SS setting type, must inherit <see cref="BaseSetting"/> or <see cref="ServerSpecificSettingBase"/>.</typeparam>
+    /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
+    /// <param name="settingId">ID of the setting.</param>
+    /// <returns>The matching <see cref="BaseSetting"/> or dummy setting if not found.</returns>
+    public static TSetting GetSetting<TMenu, TSetting>(this ReferenceHub hub, int settingId)
+    where TMenu : Menu
+    where TSetting : class
+    {
+        static T CreateDummy<T>() where T : class
+        {
+            Type t = typeof(T);
+
+            if (typeof(BaseSetting).IsAssignableFrom(t))
+            {
+                if (t == typeof(Button)) return (T)(object)new Button(int.MinValue, "", "");
+                if (t == typeof(Dropdown)) return (T)(object)new Dropdown(int.MinValue, "", []);
+                if (t == typeof(Slider)) return (T)(object)new Slider(int.MinValue, "", 0, 1);
+                if (t == typeof(ABButton)) return (T)(object)new ABButton(int.MinValue, "", "A", "B");
+                if (t == typeof(TextBox)) return (T)(object)new TextBox(int.MinValue, "");
+                if (t == typeof(TextArea)) return (T)(object)new TextArea(int.MinValue, "");
+                if (t == typeof(Keybind)) return (T)(object)new Keybind(int.MinValue, "");
+            }
+
+            if (typeof(ServerSpecificSettingBase).IsAssignableFrom(t))
+            {
+                if (t == typeof(SSButton)) return (T)(object)new SSButton(int.MinValue, "", "");
+                if (t == typeof(SSDropdownSetting)) return (T)(object)new SSDropdownSetting(int.MinValue, "", []);
+                if (t == typeof(SSSliderSetting)) return (T)(object)new SSSliderSetting(int.MinValue, "", 0, 1);
+                if (t == typeof(SSTwoButtonsSetting)) return (T)(object)new SSTwoButtonsSetting(int.MinValue, "", "A", "B");
+                if (t == typeof(SSPlaintextSetting)) return (T)(object)new SSPlaintextSetting(int.MinValue, "");
+                if (t == typeof(SSTextArea)) return (T)(object)new SSTextArea(int.MinValue, "");
+                if (t == typeof(SSKeybindSetting)) return (T)(object)new SSKeybindSetting(int.MinValue, "");
+            }
+
+            throw new Exception($"Unsupported setting type: {t.Name}");
+        }
+
+        if (!typeof(BaseSetting).IsAssignableFrom(typeof(TSetting)) && !typeof(ServerSpecificSettingBase).IsAssignableFrom(typeof(TSetting)))
+        {
+            Log.Error("MenuManager.GetSetting", $"{nameof(TSetting)} must inherit BaseSetting or ServerSpecificSettingBase, returning dummy");
+            return CreateDummy<TSetting>();
+        }
+
+        foreach (Menu menu in _registeredMenus.Where(m => m is TMenu))
+        {
+            if (!menu.BuiltSettings.TryGetValue(hub, out List<BaseSetting> builtSettings)) continue;
+
+            foreach (BaseSetting builtSetting in builtSettings)
+            {
+                if (builtSetting is BaseSetting b && typeof(TSetting) == b.GetType() &&
+                        (b.SettingId == settingId || b.SettingId - menu.Hash == settingId))
+                    return b as TSetting;
+
+                if (builtSetting.Base is ServerSpecificSettingBase ssb && typeof(TSetting) == ssb.GetType() &&
+                        (ssb.SettingId == settingId || ssb.SettingId - menu.Hash == settingId))
+                    return ssb as TSetting;
+            }
+        }
+
+        Log.Warn("MenuManager.GetSetting", $"Failed to find setting of type {typeof(TSetting).Name} ({settingId}) for hub {hub.nicknameSync.DisplayName}, returning dummy");
+        return CreateDummy<TSetting>();
+    }
+
     /// <summary>
     /// Loaded <see cref="ReferenceHub"/> menu.
     /// </summary>
