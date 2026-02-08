@@ -23,7 +23,7 @@ public static class MenuManager
     private readonly static Dictionary<Assembly, List<BaseSetting>> _pinnedBottomSettings = [];
 
     /// <summary>
-    /// Contains all loaded <see cref="Menu"/>s.
+    /// Contains all registered <see cref="Menu"/>s.
     /// </summary>
     public static IReadOnlyList<Menu> RegisteredMenus => _registeredMenus;
 
@@ -81,13 +81,11 @@ public static class MenuManager
                 .Select(t => Activator.CreateInstance(t) as Menu)];
 
             IEnumerable<Menu> orderedMenus = allMenus.OrderBy(m => m.ParentMenu == null ? 0 : 1).ThenBy(m => m.Id);
-            List<Menu> _registeredMenus = [];
 
             foreach (Menu menu in orderedMenus)
                 try
                 {
                     menu.Register();
-                    _registeredMenus.Add(menu);
                 }
                 catch (Exception e)
                 {
@@ -152,9 +150,9 @@ public static class MenuManager
     }
 
     /// <summary>
-    /// Unregister menu.
+    /// Unregister <see cref="Menu"/>.
     /// </summary>
-    /// <param name="menu">The menu.</param>
+    /// <param name="menu">The <see cref="Menu"/>.</param>
     public static void Unregister(this Menu menu)
     {
         if (_registeredMenus.Contains(menu))
@@ -166,7 +164,7 @@ public static class MenuManager
     }
 
     /// <summary>
-    /// Unregister all menus.
+    /// Unregister all <see cref="Menu"/>s.
     /// </summary>
     public static void UnregisterAllMenus()
     {
@@ -190,7 +188,7 @@ public static class MenuManager
     }
 
     /// <summary>
-    /// Register list of <see cref="BaseSetting"/>s displayed on the top of all menus.
+    /// Register list of <see cref="BaseSetting"/>s displayed on the top of all <see cref="Menu"/>s.
     /// </summary>
     /// <param name="toPin">The list of <see cref="ServerSpecificSettingBase"/> to pin.</param>
     public static void RegisterTopPinnedSettings(this List<BaseSetting> toPin) => _pinnedTopSettings[Assembly.GetCallingAssembly()] = toPin;
@@ -201,7 +199,7 @@ public static class MenuManager
     public static void UnregisterTopPinnedSettings() => _pinnedTopSettings.Remove(Assembly.GetCallingAssembly());
 
     /// <summary>
-    /// Register list of <see cref="BaseSetting"/>s displayed on the bomttom of all menus.
+    /// Register list of <see cref="BaseSetting"/>s displayed on the bomttom of all <see cref="Menu"/>s.
     /// </summary>
     /// <param name="toPin">The list of <see cref="ServerSpecificSettingBase"/> to pin.</param>
     public static void RegisterBottomPinnedSettings(this List<BaseSetting> toPin) => _pinnedBottomSettings[Assembly.GetCallingAssembly()] = toPin;
@@ -271,7 +269,7 @@ public static class MenuManager
 
     #region Menu Utils
     /// <summary>
-    /// Get a <see cref="BaseSetting"/> by Id for a hub from <typeparamref name="TMenu"/>.
+    /// Gets a <see cref="BaseSetting"/> by Id for a <see cref="ReferenceHub"/> from <typeparamref name="TMenu"/>.
     /// </summary>
     /// <typeparam name="TMenu">Target menu type.</typeparam>
     /// <typeparam name="TSetting">Target SS setting type, must inherit <see cref="BaseSetting"/> or <see cref="ServerSpecificSettingBase"/>.</typeparam>
@@ -279,8 +277,8 @@ public static class MenuManager
     /// <param name="settingId">ID of the setting.</param>
     /// <returns>The matching <see cref="BaseSetting"/> or dummy setting if not found.</returns>
     public static TSetting GetSetting<TMenu, TSetting>(this ReferenceHub hub, int settingId)
-    where TMenu : Menu
-    where TSetting : class
+        where TMenu : Menu
+        where TSetting : class
     {
         static T CreateDummy<T>() where T : class
         {
@@ -338,14 +336,61 @@ public static class MenuManager
     }
 
     /// <summary>
-    /// Loaded <see cref="ReferenceHub"/> menu.
+    /// Trys to get a <see cref="BaseSetting"/> by Id for a <see cref="ReferenceHub"/> from <typeparamref name="TMenu"/>.
+    /// </summary>
+    /// <typeparam name="TMenu">Target menu type.</typeparam>
+    /// <typeparam name="TSetting">Target SS setting type, must inherit <see cref="BaseSetting"/> or <see cref="ServerSpecificSettingBase"/>.</typeparam>
+    /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
+    /// <param name="settingId">ID of the setting.</param>
+    /// <param name="setting">The <see cref="BaseSetting"/> if found.</param>
+    /// <returns>If the matching <see cref="BaseSetting"/> was found.</returns>
+    public static bool TryGetSetting<TMenu, TSetting>(this ReferenceHub hub, int settingId, out TSetting setting)
+        where TMenu : Menu
+        where TSetting : class
+    {
+        if (!typeof(BaseSetting).IsAssignableFrom(typeof(TSetting)) && !typeof(ServerSpecificSettingBase).IsAssignableFrom(typeof(TSetting)))
+        {
+            Log.Error("MenuManager.TryGetSetting", $"{nameof(TSetting)} must inherit BaseSetting or ServerSpecificSettingBase, returning dummy");
+
+            setting = null;
+            return false;
+        }
+
+        foreach (Menu menu in _registeredMenus.Where(m => m is TMenu))
+        {
+            if (!menu.BuiltSettings.TryGetValue(hub, out List<BaseSetting> builtSettings)) continue;
+
+            foreach (BaseSetting builtSetting in builtSettings)
+            {
+                if (builtSetting is BaseSetting b && typeof(TSetting) == b.GetType() &&
+                    (b.SettingId == settingId || b.SettingId - menu.Hash == settingId))
+                {
+                    setting = b as TSetting;
+                    return false;
+                }
+
+                if (builtSetting.Base is ServerSpecificSettingBase ssb && typeof(TSetting) == ssb.GetType() &&
+                    (ssb.SettingId == settingId || ssb.SettingId - menu.Hash == settingId))
+                {
+                    setting = ssb as TSetting;
+                    return false;
+                }
+            }
+        }
+
+        setting = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Gets the <see cref="ReferenceHub"/>'s loaded <see cref="Menu"/>.
     /// </summary>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
     /// <returns><see cref="Menu"/> if <see cref="ReferenceHub"/> opens a menu, null if on the main menu.</returns>
     public static Menu GetCurrentMenu(this ReferenceHub hub) => _syncedMenus.TryGetValue(hub, out Menu menu) ? menu : null;
 
     /// <summary>
-    /// Get a menu by <see cref="Type"/>.
+    /// Get a <see cref="Menu"/> by <see cref="Type"/>.
     /// </summary>
     /// <param name="type">The type</param>
     /// <returns><see cref="Menu"/> (If Found).</returns>

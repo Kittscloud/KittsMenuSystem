@@ -15,7 +15,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="foldoutMode">Mode that the text folds out.</param>
 /// <param name="collapsedText">Text in <see cref="SSTextArea"/> when collapsed.</param>
 /// <param name="textAlignment">Alignment of text.</param>
-public class TextArea(int? id, string content, SSTextArea.FoldoutMode foldoutMode = SSTextArea.FoldoutMode.NotCollapsable, string collapsedText = null, TextAlignmentOptions textAlignment = TextAlignmentOptions.TopLeft) 
+public class TextArea(int? id, string content, SSTextArea.FoldoutMode foldoutMode = SSTextArea.FoldoutMode.NotCollapsable, string collapsedText = null, TextAlignmentOptions textAlignment = TextAlignmentOptions.TopLeft)
     : BaseSetting(new SSTextArea(SetValidId(id, content), content, foldoutMode, collapsedText, textAlignment))
 {
     /// <summary>
@@ -25,7 +25,7 @@ public class TextArea(int? id, string content, SSTextArea.FoldoutMode foldoutMod
     /// <param name="foldoutMode">Mode that the text folds out.</param>
     /// <param name="collapsedText">Text in <see cref="SSTextArea"/> when collapsed.</param>
     /// <param name="textAlignment">Alignment of text.</param>
-    public TextArea(string content, SSTextArea.FoldoutMode foldoutMode = SSTextArea.FoldoutMode.NotCollapsable, string collapsedText = null, TextAlignmentOptions textAlignment = TextAlignmentOptions.TopLeft) 
+    public TextArea(string content, SSTextArea.FoldoutMode foldoutMode = SSTextArea.FoldoutMode.NotCollapsable, string collapsedText = null, TextAlignmentOptions textAlignment = TextAlignmentOptions.TopLeft)
         : this(null, content, foldoutMode, collapsedText, textAlignment) { }
 
     /// <summary>

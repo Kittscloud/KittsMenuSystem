@@ -13,4 +13,4 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="hint">Hint of <see cref="GroupHeader"/>.</param>
 public class GroupHeader(string label, bool reducedPadding = false, string hint = null)
     : BaseSetting(new SSGroupHeader(label, reducedPadding, hint))
-{  }
+{ }

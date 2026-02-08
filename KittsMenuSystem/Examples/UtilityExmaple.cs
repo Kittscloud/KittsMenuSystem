@@ -191,7 +191,7 @@ internal class UtilityExmaple : Menu
     // You can also check access of hub, if they don't meet conditions, menu will not appear for them
     public override bool CheckAccess(ReferenceHub hub) => true; // Some condition
 
-    public override string Name { get; set; } = "Utility Exmaple";
-    public override int Id { get; set; } = -8;
+    public override string Name { get; } = "Utility Exmaple";
+    public override int Id { get; } = -5;
     public override Type ParentMenu { get; set; } = typeof(MainExample);
 }

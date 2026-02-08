@@ -16,6 +16,6 @@ internal class MainExample : Menu
             "this person has really made something great, but has abandoned the plugin, this is where I have came in, I've taken it over and updated it tremendously.")
     ];
 
-    public override string Name { get; set; } = "Main Exmaple Menu";
-    public override int Id { get; set; } = -2427;
+    public override string Name { get; } = "Main Exmaple Menu";
+    public override int Id { get; } = -3;
 }

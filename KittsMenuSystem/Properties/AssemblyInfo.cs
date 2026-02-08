@@ -27,5 +27,5 @@ using System.Runtime.InteropServices;
 //      Minor Version
 //      Fix Version
 //
-[assembly: AssemblyVersion("0.4.2")]
+[assembly: AssemblyVersion("0.4.3")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

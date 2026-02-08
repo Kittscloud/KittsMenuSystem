@@ -35,9 +35,9 @@ public class Config
     public bool ShowFullErrorToModerators { get; set; } = true;
 
     /// <summary>
-    /// Whether example menus in-built to the plugin are enabled.
+    /// Whether in-built menus events are enabled.
     /// </summary>
-    [Description("Whether example menus in-built to the plugin are enabled")]
+    [Description("Whether in-built menus events are enabled")]
     public bool EnableExamples { get; set; } = true;
 
     /// <summary>

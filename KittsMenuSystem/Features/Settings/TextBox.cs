@@ -18,7 +18,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="characterLimit">Sets <see cref="SSPlaintextSetting.CharacterLimit"/>.</param>
 /// <param name="contentType">Type of content taken.</param>
 /// <param name="hint">Hint of <see cref="SSPlaintextSetting"/>.</param>
-public class TextBox(int? id, string label, Action<ReferenceHub, string, SSPlaintextSetting> onChanged = null, string placeholder = "...", int characterLimit = 64, TMP_InputField.ContentType contentType = TMP_InputField.ContentType.Standard, string hint = null) 
+public class TextBox(int? id, string label, Action<ReferenceHub, string, SSPlaintextSetting> onChanged = null, string placeholder = "...", int characterLimit = 64, TMP_InputField.ContentType contentType = TMP_InputField.ContentType.Standard, string hint = null)
     : BaseSetting(new SSPlaintextSetting(SetValidId(id, label), label, placeholder, characterLimit, contentType, hint))
 {
     /// <summary>

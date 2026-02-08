@@ -11,26 +11,26 @@ public abstract class Menu
 {
     #region Inherited
     /// <summary>
-    /// Gets or sets name of Menu.
+    /// Gets or sets name of <see cref="Menu"/>.
     /// </summary>
-    public abstract string Name { get; set; }
+    public abstract string Name { get; }
 
     /// <summary>
-    /// Gets Hash of menu based on <see cref="Name"/>. Used to seperate menu settings.
+    /// Gets Hash of <see cref="Menu"/> based on <see cref="Name"/>. Used to seperate menu settings.
     /// </summary>
     public int Hash => Mathf.Abs(Name.GetHashCode() % 100000);
 
     /// <summary>
-    /// Gets or sets the id of Menu (Must be greater than 0).
+    /// Gets or sets the id of <see cref="Menu"/> (Must be greater than 0).
     /// </summary>
-    public abstract int Id { get; set; }
+    public abstract int Id { get; }
 
     /// <summary>
-    /// Parent menu.
+    /// Parent <see cref="Menu"/>.
     /// </summary>
-    #nullable enable
+#nullable enable
     public virtual Type? ParentMenu { get; set; } = null;
-    #nullable disable
+#nullable disable
 
     /// <summary>
     /// Gets in-built settings.
@@ -45,13 +45,13 @@ public abstract class Menu
     public virtual bool CheckAccess(ReferenceHub hub) => true;
 
     /// <summary>
-    /// Executed when <see cref="ReferenceHub"/> opens the menu.
+    /// Executed when <see cref="ReferenceHub"/> opens the <see cref="Menu"/>.
     /// </summary>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
     protected internal virtual void OnOpen(ReferenceHub hub) { }
 
     /// <summary>
-    /// Executed when <see cref="ReferenceHub"/> closes the menu.
+    /// Executed when <see cref="ReferenceHub"/> closes the <see cref="Menu"/>.
     /// </summary>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
     protected internal virtual void OnClose(ReferenceHub hub) { }
@@ -69,12 +69,12 @@ public abstract class Menu
     internal Dictionary<int, ServerSpecificSettingBase> DefinitionCache { get; } = [];
 
     /// <summary>
-    /// Built settings per <see cref="ReferenceHub"/> for this menu.
+    /// Built settings per <see cref="ReferenceHub"/> for this <see cref="Menu"/>.
     /// </summary>
     internal Dictionary<ReferenceHub, List<BaseSetting>> BuiltSettings { get; } = [];
 
     /// <summary>
-    /// Gets built settings for a given <see cref="ReferenceHub"/> in this menu.
+    /// Gets built settings for a given <see cref="ReferenceHub"/> in this <see cref="Menu"/>.
     /// </summary>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
     /// <param name="callSettings">Should function call settings.</param>
@@ -153,7 +153,7 @@ public abstract class Menu
     }
 
     /// <summary>
-    /// Generate the settings to display for a given <see cref="ReferenceHub"/> in this menu.
+    /// Generate the settings to display for a given <see cref="ReferenceHub"/> in this <see cref="Menu"/>.
     /// Includes _pinned content, return/submenu buttons, headers, and any hub-specific overrides.
     /// </summary>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>

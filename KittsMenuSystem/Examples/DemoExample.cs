@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using KittsMenuSystem.Features.Menus;
 using KittsMenuSystem.Features.Settings;
+using System;
+using System.Collections.Generic;
 using UserSettings.ServerSpecific;
 
 namespace KittsMenuSystem.Examples;
@@ -38,7 +38,7 @@ internal class DemoExample : Menu
         new Button("Another Button", "Press me! (again)", (_, _) => { }, hint: "Triggers an event whenever it is pressed.")
     ];
 
-    public override string Name { get; set; } = "Demo Example";
-    public override int Id { get; set; } = -6;
+    public override string Name { get; } = "Demo Example";
+    public override int Id { get; } = -2;
     public override Type ParentMenu { get; set; } = typeof(MainExample);
 }

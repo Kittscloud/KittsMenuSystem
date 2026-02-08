@@ -26,6 +26,6 @@ internal class CentralMainMenu : Menu
         return settings;
     }
 
-    public override string Name { get; set; } = "Main Menu";
-    public override int Id { get; set; } = 0;
+    public override string Name { get; } = "Main Menu";
+    public override int Id { get; } = 0;
 }

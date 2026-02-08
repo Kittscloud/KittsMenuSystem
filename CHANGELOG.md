@@ -1,5 +1,10 @@
 # KittsMenuSystem Changelog
 
+## Version 0.4.3
+- Added `TryGetSetting` function - Works the same as the `GetSetting` but returns `false` instead of a dummy if no setting found.
+- Updated `XML Summaries` - Updated a lot of the summaries.
+- Updated `Menu` class - `Name` and `Id` can no longer be set, can only get them.
+
 ## Version 0.4.2
 - Fixed `GetSettings` function - Fixed a bug where function was not returning the rebuilt settings.
 - Fixed `RebuildSettings` function - Fixed a bug where function was not rebuilding settings correctly.

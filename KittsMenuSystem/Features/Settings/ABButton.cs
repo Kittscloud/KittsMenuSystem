@@ -17,7 +17,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="onChanged">Tiggers <see cref="Action"/> when <see cref="ABButton"/> changes.</param>
 /// <param name="defaultIsB">Sets <see cref="SSTwoButtonsSetting.DefaultIsB"/>.</param>
 /// <param name="hint">Hint of <see cref="SSTwoButtonsSetting"/>.</param>
-public class ABButton(int? id, string label, string optionA, string optionB, Action<ReferenceHub, bool, SSTwoButtonsSetting> onChanged = null, bool defaultIsB = false, string hint = null) 
+public class ABButton(int? id, string label, string optionA, string optionB, Action<ReferenceHub, bool, SSTwoButtonsSetting> onChanged = null, bool defaultIsB = false, string hint = null)
     : BaseSetting(new SSTwoButtonsSetting(SetValidId(id, label), label, optionA, optionB, defaultIsB, hint))
 {
     /// <summary>
@@ -29,7 +29,7 @@ public class ABButton(int? id, string label, string optionA, string optionB, Act
     /// <param name="onChanged">Tiggers <see cref="Action"/> when <see cref="ABButton"/> changes.</param>
     /// <param name="defaultIsB">Sets <see cref="SSTwoButtonsSetting.DefaultIsB"/>.</param>
     /// <param name="hint">Hint of <see cref="SSTwoButtonsSetting"/>.</param>
-    public ABButton(string label, string optionA, string optionB, Action<ReferenceHub, bool, SSTwoButtonsSetting> onChanged = null, bool defaultIsB = false, string hint = null) 
+    public ABButton(string label, string optionA, string optionB, Action<ReferenceHub, bool, SSTwoButtonsSetting> onChanged = null, bool defaultIsB = false, string hint = null)
         : this(null, label, optionA, optionB, onChanged, defaultIsB, hint) { }
 
     /// <summary>

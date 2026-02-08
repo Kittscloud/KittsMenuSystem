@@ -23,7 +23,7 @@ To install `KittsMenuSystem` on your server, you will need:
 - `Harmony` `v2.4.2` or later.
 - `KittsMenuSystem` latest version.
 
-All of these files can be found in the [`latest release`](https://github.com/Kittscloud/KittsInfractionSystem/releases/latest).
+All of these files can be found in the [`latest release`](https://github.com/Kittscloud/KittsMenuSystem/releases/latest).
 
 Once you have these:
 - Place `Harmony.dll` in the `dependencies` folder.
@@ -111,39 +111,42 @@ public class Test : Menu
 ```
 
 ### Menu Class
-| Parameter / Method | Type / Return Type   | Description                                                              |
-|--------------------|----------------------|--------------------------------------------------------------------------|
-| `Name`             | `string`             | Name of the menu, displayed as header and on buttons. Must be unique.    |
-| `Id`               | `int`                | ID of the menu. Must be greater than 0.                                  |
-| `ParentMenu`       | `Type?`              | Optional parent menu type for sub-menus.                                 |
-| `Hash`             | `int`                | Read-only hash derived from `Name` to separate settings.                 |
-| `CheckAccess(hub)` | `bool`               | Determines whether a player can access the menu. Default returns `true`. |
-| `Settings(hub)`    | `List<BaseSettings>` | Override to provide hub-specific basesettings.                           |
-| `OnOpen(hub)`      | `void`               | Called when a player opens the menu.                                     |
-| `OnClose(hub)`     | `void`               | Called when a player closes the menu.                                    |
-| `ReloadFor(hub)`   | `void`               | Reloads this menu for a specific player.                                 |
-| `ReloadForAll()`   | `void`               | Reloads this menu for all players.                                       |
-| `OnRegistered()`   | `void`               | Called when the menu is registered.                                      |
+| Parameter / Method          | Type / Return Type   | Description                                                              |
+|-----------------------------|----------------------|--------------------------------------------------------------------------|
+| `Name`                      | `string`             | Name of the menu, displayed as header and on buttons. Must be unique.    |
+| `Id`                        | `int`                | ID of the menu. Must be greater than 0.                                  |
+| `ParentMenu`                | `Type?`              | Optional parent menu type for sub-menus.                                 |
+| `Hash`                      | `int`                | Read-only hash derived from `Name` to separate settings.                 |
+| `CheckAccess(ReferenceHub)` | `bool`               | Determines whether a player can access the menu. Default returns `true`. |
+| `Settings(ReferenceHub)`    | `List<BaseSettings>` | Override to provide hub-specific basesettings.                           |
+| `OnOpen(ReferenceHub)`      | `void`               | Called when a player opens the menu.                                     |
+| `OnClose(ReferenceHub)`     | `void`               | Called when a player closes the menu.                                    |
+| `ReloadFor(ReferenceHub)`   | `void`               | Reloads this menu for a specific player.                                 |
+| `ReloadForAll()`            | `void`               | Reloads this menu for all players.                                       |
+| `OnRegistered()`            | `void`               | Called when the menu is registered.                                      |
 
 ### MenuManager Class
-| Parameter / Method                             | Type / Return Type                             | Description                                                      |
-|------------------------------------------------|------------------------------------------------|------------------------------------------------------------------|
-| `SyncedMenus`                                  | `IReadOnlyDictionary<ReferenceHub, Menu>`      | Currently loaded menu for each player.                           |
-| `ResgisteredMenus`                             | `IReadOnlyList<Menu>`                          | All menus registered in the system.                              |
-| `Pinned`                                       | `IReadOnlyDictionary<Assembly, List<TextArea>` | All pinned content registered by assemblies.                     |
-| `RegisterAllMenus()`                           | `void`                                         | Registers all menus in the calling assembly.                     |
-| `Register(this Menu menu)`                     | `void`                                         | Registers a specific menu instance. Throws exception if invalid. |
-| `Unregister(this Menu menu)`                   | `void`                                         | Unregisters a menu and removes it from all players.              |
-| `UnregisterAllMenus()`                         | `void`                                         | Unregisters all menus.                                           |
-| `GetCurrentMenu(this ReferenceHub hub)`        | `Menu`                                         | Returns the menu the player currently has open.                  |
-| `LoadMenu(this ReferenceHub hub, Menu menu)`   | `void`                                         | Loads a menu for a player, handling access and pinned content.   |
-| `DeleteFromMenuSync(this ReferenceHub hub)`    | `void`                                         | Removes the player from `MenuSync` when leaving.                 |
-| `GetMenu(this Type type)`                      | `Menu`                                         | Returns a menu instance by type.                                 |
-| `ReloadMenu<T>(this ReferenceHub hub, T menu)` | `void`                                         | Reloads a specific menu for a player.                            |
-| `ReloadCurrentMenu(this ReferenceHub hub)`     | `void`                                         | Reloads the current menu for a player.                           |
-| `ReloadAll()`                                  | `void`                                         | Reloads current menu for all players.                            |
-| `RegisterPins(this List<TextArea> toPin)`      | `void`                                         | Registers pins for the calling assembly.                         |
-| `UnregisterPins()`                             | `void`                                         | Removes all pins registered by the calling assembly.             |
+| Parameter / Method                                                | Type / Return Type                             | Description                                                              |
+|-------------------------------------------------------------------|------------------------------------------------|--------------------------------------------------------------------------|
+| `SyncedMenus`                                                     | `IReadOnlyDictionary<ReferenceHub, Menu>`      | Currently loaded menu for each player.                                   |
+| `ResgisteredMenus`                                                | `IReadOnlyList<Menu>`                          | All menus registered in the system.                                      |
+| `Pinned`                                                          | `IReadOnlyDictionary<Assembly, List<TextArea>` | All pinned content registered by assemblies.                             |
+| `RegisterAllMenus()`                                              | `void`                                         | Registers all menus in the calling assembly.                             |
+| `Register(Menu)`                                                  | `void`                                         | Registers a specific menu instance. Throws exception if invalid.         |
+| `Unregister(Menu)`                                                | `void`                                         | Unregisters a menu and removes it from all players.                      |
+| `UnregisterAllMenus()`                                            | `void`                                         | Unregisters all menus.                                                   |
+| `GetCurrentMenu(ReferenceHub)`                                    | `Menu`                                         | Returns the menu the player currently has open.                          |
+| `DeleteFromMenuSync(ReferenceHub)`                                | `void`                                         | Removes the player from `MenuSync` when leaving.                         |
+| `RegisterTopPinnedSettings(List<BaseSetting>)`                    | `void`                                         | Register list of `BaseSettings` displayed on the top of all `Menus`.     |
+| `UnregisterTopPinnedSettings()`                                   | `void`                                         | Remove top pinnedsettings  from `Assembly.GetCallingAssembly`.           |
+| `RegisterBottomPinnedSettings(List<BaseSetting>)`                 | `void`                                         | Register list of `BaseSettings` displayed on the bomttom of all `Menus`. |
+| `UnregisterBottomPinnedSettings()`                                | `void`                                         | Remove bottom pinned settings from  `Assembly.GetCallingAssembly`.       |
+| `GetSetting<TMenu, TSetting>(ReferenceHub, int)`                  | `TSetting`                                     | Gets a `BaseSetting` by Id for a `ReferenceHub` from `TMenu`.            |
+| `TryGetSetting<TMenu, TSetting>(ReferenceHub, int, out TSetting)` | `bool`                                         | Trys to get a `BaseSetting` by Id for a `ReferenceHub` from `TMenu`.     |
+| `GetCurrentMenu(ReferenceHub)`                                    | `Menu`                                         | Gets the `ReferenceHub's` loaded `Menu`.                                 |
+| `GetMenu(Type)`                                                   | `Menu`                                         | Returns a menu instance by type.                                         |
+| `ReloadCurrentMenu(ReferenceHub)`                                 | `void`                                         | Reloads the current menu for a player.                                   |
+| `ReloadAll()`                                                     | `void`                                         | Reloads current menu for all players.                                    |
 
 You can look at the [`Examples`](https://github.com/Kittscloud/KittsMenuSystem/tree/main/KittsMenuSystem/Examples) folder to get a better idea of how `Menus` and `Settings` are implemented.
 

@@ -13,9 +13,6 @@ internal class MenuEvents : CustomEventsHandler
 {
     public override void OnPlayerJoined(PlayerJoinedEventArgs ev)
     {
-        foreach (Menu menu in MenuManager.RegisteredMenus.Where(m => m.CheckAccess(ev.Player.ReferenceHub)))
-            menu.ReloadFor(ev.Player.ReferenceHub);
-
         ev.Player.ReferenceHub.LoadMenu(new GlobalMenu());
         MenuState[ev.Player.ReferenceHub] = (false, null);
     }
@@ -31,10 +28,10 @@ internal class MenuEvents : CustomEventsHandler
         Log.Debug("EventHandler.OnSettingReceived", $"Received input for {hub.nicknameSync.DisplayName}: {ss.SettingId} ({ss.GetType().Name})");
 
         try
-        {   
+        {
             Menu menu = hub.GetCurrentMenu();
 
-			BaseSetting target = menu.GetSettings(hub, false, false).FirstOrDefault(b => b.SettingId == ss.SettingId);
+            BaseSetting target = menu.GetSettings(hub, false, false).FirstOrDefault(b => b.SettingId == ss.SettingId);
 
             if (target == null)
             {
@@ -42,7 +39,7 @@ internal class MenuEvents : CustomEventsHandler
                 return;
             }
 
-			Log.Debug("EventHandler.OnSettingReceived", $"Target setting found: {target.SettingId} ({target.GetType().Name})");
+            Log.Debug("EventHandler.OnSettingReceived", $"Target setting found: {target.SettingId} ({target.GetType().Name})");
 
             // Sync setting
             target.Base = ss;

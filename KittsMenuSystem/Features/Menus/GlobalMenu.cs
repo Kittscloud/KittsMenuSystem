@@ -24,6 +24,6 @@ internal class GlobalMenu : Menu
         return settings;
     }
 
-    public override string Name { get; set; } = "Global Menu";
-    public override int Id { get; set; } = 1;
+    public override string Name { get; } = "Global Menu";
+    public override int Id { get; } = 1;
 }

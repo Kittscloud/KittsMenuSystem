@@ -1,5 +1,6 @@
 using KittsMenuSystem.Features.Menus;
 using KittsMenuSystem.Features.Settings;
+using System;
 using System.Collections.Generic;
 
 namespace KittsMenuSystem.Examples;
@@ -13,6 +14,7 @@ internal class AccessExmaple : Menu
 
     public override bool CheckAccess(ReferenceHub hub) => false;
 
-    public override string Name { get; set; } = "Access Menu";
-    public override int Id { get; set; } = -243;
+    public override string Name { get; } = "Access Menu";
+    public override int Id { get; } = -1;
+    public override Type ParentMenu { get; set; } = typeof(MainExample);
 }

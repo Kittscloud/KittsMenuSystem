@@ -8,7 +8,6 @@ using LabApi.Loader.Features.Plugins;
 using LabApi.Loader.Features.Plugins.Enums;
 using System;
 using UserSettings.ServerSpecific;
-using MenuEvents = KittsMenuSystem.Features.MenuEvents;
 
 namespace KittsMenuSystem;
 
@@ -21,7 +20,7 @@ public class KittsMenuSystem : Plugin
     public override string Description { get; } = "";
     public override LoadPriority Priority { get; } = LoadPriority.Lowest;
 
-    public override Version Version { get; } = new Version(0, 4, 2);
+    public override Version Version { get; } = new Version(0, 4, 3);
     public override Version RequiredApiVersion { get; } = new Version(LabApiProperties.CompiledVersion);
 
     public static Config Config { get; set; }

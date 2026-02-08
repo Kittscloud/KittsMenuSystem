@@ -1,8 +1,8 @@
+using KittsMenuSystem.Features.Menus;
+using KittsMenuSystem.Features.Settings;
 using System;
 using System.Collections.Generic;
-using KittsMenuSystem.Features.Settings;
 using UserSettings.ServerSpecific;
-using KittsMenuSystem.Features.Menus;
 
 namespace KittsMenuSystem.Examples;
 
@@ -20,7 +20,7 @@ internal class TextAreaExample : Menu
         new TextArea("This multi-line text area cannot be collapsed.\nIt remains fully expanded at all times, but supports URL links.\nExample link: <link=\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"><mark=#5865f215>[Click]</mark></link>"),
     ];
 
-    public override string Name { get; set; } = "Text Area Example";
-    public override int Id { get; set; } = -7;
+    public override string Name { get; } = "Text Area Example";
+    public override int Id { get; } = -4;
     public override Type ParentMenu { get; set; } = typeof(MainExample);
 }

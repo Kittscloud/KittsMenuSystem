@@ -20,7 +20,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="valueToStringFormat">Sets <see cref="SSSliderSetting.ValueToStringFormat"/>.</param>
 /// <param name="finalDisplayFormat">Sets <see cref="SSSliderSetting.FinalDisplayFormat"/>..</param>
 /// <param name="hint">Hint of <see cref="SSSliderSetting"/>.</param>
-public class Slider(int? id, string label, float minValue, float maxValue, Action<ReferenceHub, float, SSSliderSetting> onChanged = null, float defaultValue = 0, bool integer = false, string valueToStringFormat = "0.##", string finalDisplayFormat = "{0}", string hint = null) 
+public class Slider(int? id, string label, float minValue, float maxValue, Action<ReferenceHub, float, SSSliderSetting> onChanged = null, float defaultValue = 0, bool integer = false, string valueToStringFormat = "0.##", string finalDisplayFormat = "{0}", string hint = null)
     : BaseSetting(new SSSliderSetting(SetValidId(id, label), label, minValue, maxValue, defaultValue, integer, valueToStringFormat, finalDisplayFormat, hint))
 {
     /// <summary>

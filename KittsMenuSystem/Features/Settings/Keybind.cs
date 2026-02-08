@@ -18,7 +18,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="preventInteractionOnGui">Sets <see cref="SSKeybindSetting.PreventInteractionOnGUI"/>, will not work when in settings unless in the menu with the keybind.</param>
 /// <param name="allowSpectatorTrigger">Sets <see cref="SSKeybindSetting.AllowSpectatorTrigger"/></param>
 /// <param name="hint">Hint of <see cref="SSKeybindSetting"/>.</param>
-public class Keybind(int? id, string label, Action<ReferenceHub, bool, SSKeybindSetting> onUsed = null, KeyCode suggestedKey = KeyCode.None, bool preventInteractionOnGui = true, bool allowSpectatorTrigger = true, string hint = null) 
+public class Keybind(int? id, string label, Action<ReferenceHub, bool, SSKeybindSetting> onUsed = null, KeyCode suggestedKey = KeyCode.None, bool preventInteractionOnGui = true, bool allowSpectatorTrigger = true, string hint = null)
     : BaseSetting(new SSKeybindSetting(SetValidId(id, label), label, suggestedKey, preventInteractionOnGui, allowSpectatorTrigger, hint))
 {
     /// <summary>
