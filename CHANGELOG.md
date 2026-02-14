@@ -1,5 +1,8 @@
 # KittsMenuSystem Changelog
 
+## Version 0.4.4
+- Added `NuGet Package` - Can now use the NuGet package.
+
 ## Version 0.4.3
 - Added `TryGetSetting` function - Works the same as the `GetSetting` but returns `false` instead of a dummy if no setting found.
 - Updated `XML Summaries` - Updated a lot of the summaries.
