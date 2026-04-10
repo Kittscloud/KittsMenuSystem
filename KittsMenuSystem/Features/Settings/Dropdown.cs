@@ -18,7 +18,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="entryType">Sets <see cref="SSDropdownSetting.EntryType"/>.</param>
 /// <param name="hint">Hint of <see cref="SSDropdownSetting"/>.</param>
 public class Dropdown(int? id, string label, string[] options, Action<ReferenceHub, int, SSDropdownSetting> onChanged = null, int defaultOptionIndex = 0, SSDropdownSetting.DropdownEntryType entryType = SSDropdownSetting.DropdownEntryType.Regular, string hint = null)
-    : BaseSetting(new SSDropdownSetting(SetValidId(id, label), label, options, defaultOptionIndex, entryType, hint))
+    : BaseSetting(new SSDropdownSetting(id ?? Guid.NewGuid().ToString().GetStableHashCode(), label, options, defaultOptionIndex, entryType, hint))
 {
     /// <summary>
     /// Initialize new <see cref="Dropdown"/> setting (automatic id) with base <see cref="SSDropdownSetting"/> that calls <see cref="Action"/> when changed.
@@ -41,8 +41,18 @@ public class Dropdown(int? id, string label, string[] options, Action<ReferenceH
     public Action<ReferenceHub, int, SSDropdownSetting> OnChanged { get; } = onChanged;
 
     /// <summary>
-    /// Makes sure the Id is valid (not null)
+    /// Shortcut to underlying <see cref="SSDropdownSetting.Options"/>.
     /// </summary>
-    internal static int SetValidId(int? id, string label) =>
-        id ?? (label + "Button").GetStableHashCode();
+    public string[] Options
+    {
+        get => (Base as SSDropdownSetting).Options;
+        set => UpdateOptions(value);
+    }
+
+    /// <summary>
+    /// Shortcut to underlying <see cref="SSDropdownSetting.SendDropdownUpdate"/>.
+    /// <see cref="SSDropdownSetting.Options"/> will go back to default (what was set in the menu) when rejoining server.
+    /// </summary>
+    public void UpdateOptions(string[] newOptions, bool applyOverride = true, Func<ReferenceHub, bool> receiveFilter = null) =>
+        (Base as SSDropdownSetting).SendDropdownUpdate(newOptions, applyOverride, receiveFilter);
 }

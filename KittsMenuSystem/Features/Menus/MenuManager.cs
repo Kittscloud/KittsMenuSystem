@@ -215,9 +215,13 @@ public static class MenuManager
     /// Load <see cref="Menu"/> for <see cref="ReferenceHub"/>.
     /// Null loads main menu.
     /// </summary>
+    /// <remarks>
+    /// Loading a menu will not open the user settings, only change the menu in the SS tab.
+    /// </remarks>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
     /// <param name="menu">Target <see cref="Menu"/>.</param>
-    internal static void LoadMenu(this ReferenceHub hub, Menu menu)
+    /// <param name="versionOverride">Version of the menu.</param>
+    public static void LoadMenu(this ReferenceHub hub, Menu menu, int? versionOverride = null)
     {
         hub.GetCurrentMenu()?.OnClose(hub);
 
@@ -246,7 +250,7 @@ public static class MenuManager
         List<BaseSetting> settings = menu.GetSettings(hub, true, true);
         _syncedMenus[hub] = menu;
 
-        hub.SendSettings(settings);
+        hub.SendSettings(settings, versionOverride);
 
         menu.OnOpen(hub);
     }
@@ -256,14 +260,15 @@ public static class MenuManager
     /// </summary>
     /// <param name="hub">Target <see cref="ReferenceHub"/>.</param>
     /// <param name="settings">List of <see cref="BaseSetting"/> to send.</param>
-    internal static void SendSettings(this ReferenceHub hub, List<BaseSetting> settings)
+    /// <param name="versionOverride">Version of the menu.</param>
+    internal static void SendSettings(this ReferenceHub hub, List<BaseSetting> settings, int? versionOverride = null)
     {
         List<ServerSpecificSettingBase> settingsToSend = [];
 
         foreach (BaseSetting setting in settings)
             settingsToSend.Add(setting.Base);
 
-        hub.connectionToClient.Send(new SSSEntriesPack([.. settingsToSend], ServerSpecificSettingsSync.Version));
+        ServerSpecificSettingsSync.SendToPlayer(hub, [.. settingsToSend], versionOverride);
     }
     #endregion
 
@@ -285,7 +290,7 @@ public static class MenuManager
             Type t = typeof(T);
 
             if (typeof(BaseSetting).IsAssignableFrom(t))
-            {
+            {   
                 if (t == typeof(Button)) return (T)(object)new Button(int.MinValue, "", "");
                 if (t == typeof(Dropdown)) return (T)(object)new Dropdown(int.MinValue, "", []);
                 if (t == typeof(Slider)) return (T)(object)new Slider(int.MinValue, "", 0, 1);
@@ -392,19 +397,24 @@ public static class MenuManager
     /// <summary>
     /// Get a <see cref="Menu"/> by <see cref="Type"/>.
     /// </summary>
-    /// <param name="type">The type</param>
-    /// <returns><see cref="Menu"/> (If Found).</returns>
+    /// <param name="type">The type of <see cref="Menu"/>.</param>
+    /// <returns><see cref="Menu"/> found otherwise null.</returns>
     public static Menu GetMenu(this Type type) => _registeredMenus.FirstOrDefault(x => x.GetType() == type);
 
     /// <summary>
     /// Reload current <see cref="Menu"/> for <see cref="ReferenceHub"/>.
     /// </summary>
     /// <param name="hub">The target <see cref="ReferenceHub"/>.</param>
-    public static void ReloadCurrentMenu(this ReferenceHub hub) => hub.LoadMenu(hub.GetCurrentMenu());
+    /// <param name="versionOverride">Version of the menu.</param>
+    public static void ReloadCurrentMenu(this ReferenceHub hub, int? versionOverride = null) => hub.LoadMenu(hub.GetCurrentMenu(), versionOverride);
 
     /// <summary>
     /// Reload current <see cref="Menu"/> for all <see cref="ReferenceHub"/>s.
     /// </summary>
-    public static void ReloadAll() { foreach (ReferenceHub hub in ReferenceHub.AllHubs.Where(h => h.isClient)) hub.ReloadCurrentMenu(); }
+    /// <param name="versionOverride">Version of the menu.</param>
+    public static void ReloadAll(int? versionOverride = null) { 
+        foreach (ReferenceHub hub in ReferenceHub.AllHubs.Where(h => h.isClient))
+            hub.ReloadCurrentMenu(versionOverride);
+    }
     #endregion
 }

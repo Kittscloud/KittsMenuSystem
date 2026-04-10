@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UserSettings.ServerSpecific;
+using static UnityEngine.GraphicsBuffer;
 
 namespace KittsMenuSystem.Features.Menus;
 
@@ -16,7 +17,8 @@ public abstract class Menu
     public abstract string Name { get; }
 
     /// <summary>
-    /// Gets Hash of <see cref="Menu"/> based on <see cref="Name"/>. Used to seperate menu settings.
+    /// Gets Hash of <see cref="Menu"/> based on <see cref="Name"/>. 
+    /// Used to seperate menu settings.
     /// </summary>
     public int Hash => Mathf.Abs(Name.GetHashCode() % 100000);
 
@@ -25,10 +27,10 @@ public abstract class Menu
     /// </summary>
     public abstract int Id { get; }
 
+#nullable enable
     /// <summary>
     /// Parent <see cref="Menu"/>.
     /// </summary>
-#nullable enable
     public virtual Type? ParentMenu { get; set; } = null;
 #nullable disable
 
@@ -40,7 +42,7 @@ public abstract class Menu
     /// <summary>
     /// <see cref="Menu"/> avaliable to <see cref="ReferenceHub"/>.
     /// </summary>
-    /// <param name="hub">The target <see cref="ReferenceHub"/></param>
+    /// <param name="hub">The target <see cref="ReferenceHub"/>.</param>
     /// <returns><see cref="ReferenceHub"/> can use menu.</returns>
     public virtual bool CheckAccess(ReferenceHub hub) => true;
 
@@ -63,6 +65,51 @@ public abstract class Menu
     #endregion
 
     #region Settings
+    /// <summary>
+    /// Additional settings to insert relative to existing settings,
+    /// based on a target setting ID and insert mode.
+    /// </summary>
+    public List<AddedSetting> AddedSettings { get; set; } = [];
+
+    /// <summary>
+    /// Determines where an <see cref="AddedSetting"/> should be inserted
+    /// relative to the target setting.
+    /// </summary>
+    public enum InsertMode
+    {
+        /// <summary>
+        /// Inserts the setting after the target setting.
+        /// </summary>
+        After,
+
+        /// <summary>
+        /// Inserts the setting before the target setting.
+        /// </summary>
+        Before
+    }
+
+    /// <summary>
+    /// Represents a setting that should be inserted into a menu
+    /// relative to another setting identified by <see cref="TargetId"/>.
+    /// </summary>
+    public class AddedSetting(int? targetId, BaseSetting setting, InsertMode mode = InsertMode.After)
+    {
+        /// <summary>
+        /// The ID of the target setting that this setting should be positioned relative to.
+        /// </summary>
+        public int? TargetId { get; set; } = targetId;
+
+        /// <summary>
+        /// The setting instance to insert into the menu.
+        /// </summary>
+        public BaseSetting Setting { get; set; } = setting;
+
+        /// <summary>
+        /// Determines whether the setting is inserted before or after the target setting.
+        /// </summary>
+        public InsertMode Mode { get; set; } = mode;
+    }
+
     /// <summary>
     /// Original definitions for built settings.
     /// </summary>
@@ -200,6 +247,22 @@ public abstract class Menu
         settings.Add(new GroupHeader(Name));
         settings.AddRange(Settings(hub));
 
+        foreach (var added in AddedSettings)
+        {
+            if (added.TargetId == null)
+                settings.Add(added.Setting);
+
+            int index = settings.FindIndex(s => s.SettingId == added.TargetId);
+
+            if (index >= 0)
+                if (added.Mode == InsertMode.After)
+                    settings.Insert(index + 1, added.Setting);
+                else
+                    settings.Insert(index, added.Setting);
+            else
+                settings.Add(added.Setting);
+        }
+
         settings.AddRange(MenuManager.PinnedBottomSettings.Values.SelectMany(p => p));
 
         Dictionary<int, BaseSetting> seen = [];
@@ -226,15 +289,17 @@ public abstract class Menu
     /// Reload this <see cref="Menu"/> for <see cref="ReferenceHub"/>.
     /// </summary>
     /// <param name="hub">The target <see cref="ReferenceHub"/>.</param>
-    public void ReloadFor(ReferenceHub hub) => hub.LoadMenu(this);
+    /// <param name="versionOverride">Version of the menu.</param>
+    public void ReloadFor(ReferenceHub hub, int? versionOverride = null) => hub.LoadMenu(this, versionOverride);
 
     /// <summary>
     /// Reload this <see cref="Menu"/> for all <see cref="ReferenceHub"/>s.
     /// </summary>
-    public void ReloadForAll()
+    /// <param name="versionOverride">Version of the menu.</param>
+    public void ReloadForAll(int? versionOverride = null)
     {
         foreach (ReferenceHub hub in MenuManager.SyncedMenus.Where(x => x.Value == this).Select(x => x.Key).ToList())
-            ReloadFor(hub);
+            ReloadFor(hub, versionOverride);
     }
     #endregion
 }

@@ -6,23 +6,16 @@ using UserSettings.ServerSpecific;
 namespace KittsMenuSystem.Features.Menus;
 
 /// <summary>
-/// Used to load all settings when player is not in settings so they can be accessed from everywhere.
+/// Used to load all keybind settings when menu tab is closed allowing all keybinds to be accessible when closed.
 /// </summary>
 internal class GlobalMenu : Menu
 {
-    public override List<BaseSetting> Settings(ReferenceHub hub)
-    {
-        List<BaseSetting> settings = [.. MenuManager.RegisteredMenus
+    public override List<BaseSetting> Settings(ReferenceHub hub) =>
+        [.. MenuManager.RegisteredMenus
             .Where(m => m.CheckAccess(hub))
             .SelectMany(m => m.GetSettings(hub, false, false))
             .Where(s => s.Base is SSKeybindSetting)
         ];
-
-        foreach (Menu menu in MenuManager.RegisteredMenus.Where(m => m.CheckAccess(hub)))
-            settings.AddRange(menu.GetSettings(hub, false, false));
-
-        return settings;
-    }
 
     public override string Name { get; } = "Global Menu";
     public override int Id { get; } = 1;

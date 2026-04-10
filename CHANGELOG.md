@@ -1,5 +1,55 @@
 # KittsMenuSystem Changelog
 
+## Version 0.5.0
+- Added `ABButton.OptionA` - Get or set the underlying `SSTwoButtonsSetting.OptionA`.
+- Added `ABButton.OptionB` - Get or set the underlying `SSTwoButtonsSetting.OptionB`.
+- Added `BaseSetting.Label` - Get or set the underlying `ServerSpecificSettingBase.Label`.
+- Added `BaseSetting.HintDescription` - Get or set the underlying `ServerSpecificSettingBase.HintDescription`.
+- Added `Button.ButtonText` - Get or set the underlying `SSButton.ButtonText`.
+- Added `Button.HoldTimeSeconds` - Get or set the underlying `SSButton.HoldTimeSeconds`.
+- Added `Dropdown.Options` - Get or set the underlying `SSDropdownSetting.Options`.
+- Added `Slider.MinValue` - Get or set the underlying `SSSliderSetting.MinValue`.
+- Added `Slider.MaxValue` - Get or set the underlying `SSSliderSetting.MaxValue`.
+- Added `Slider.Integer` - Get or set the underlying `SSSliderSetting.Integer`.
+- Added `Slider.ValueToStringFormat` - Get or set the underlying `SSSliderSetting.ValueToStringFormat`.
+- Added `Slider.FinalDisplayFormat` - Get or set the underlying `SSSliderSetting.FinalDisplayFormat`.
+- Added `Slider.FinalDisplayFormat` - Get or set the underlying `SSSliderSetting.FinalDisplayFormat`.
+- Added `TextArea.Content` - Same as `BaseSetting.Label` but made to match naming.
+- Added `TextBox.Placeholder` - Get or set the underlying `SSPlaintextSetting.Placeholder`.
+- Added `TextBox.CharacterLimit` - Get or set the underlying `SSPlaintextSetting.CharacterLimit`.
+- Added `TextBox.ContentType` - Get or set the underlying `SSPlaintextSetting.ContentType`.
+- Added `UpdateOptionA` function - Updates the `ABButton.OptionA`.
+- Added `UpdateOptionB` function - Updates the `ABButton.OptionB`.
+- Added `UpdateLabel` function - Updates the `BaseSetting.Label`.
+- Added `UpdateHintDescription` function - Updates the `BaseSetting.HintDescription`.
+- Added `UpdateButtonText` function - Updates the `Button.ButtonText`.
+- Added `UpdateHoldTimeSeconds` function - Updates the `Button.HoldTimeSeconds`.
+- Added `UpdateOptions` function - Updates the `Dropdown.Options`.
+- Added `UpdateMinValue` function - Updates the `Slider.MinValue`.
+- Added `UpdateMaxValue` function - Updates the `Slider.MaxValue`.
+- Added `UpdateInteger` function - Updates the `Slider.Integer`.
+- Added `UpdateValueToStringFormat` function - Updates the `Slider.ValueToStringFormat`.
+- Added `UpdateFinalDisplayFormat` function - Updates the `Slider.FinalDisplayFormat`.
+- Added `UpdatePlaceholder` function - Updates the `TextBox.Placeholder`.
+- Added `UpdateCharacterLimit` function - Updates the `TextBox.CharacterLimit`.
+- Added `UpdateContentType` function - Updates the `TextBox.ContentType`.
+- Added `Menu.AddedSettings` - Can now add settings to the end of `Menus` from outside the `Menu`.
+- Updated `.csproj` - Updated some dependencies.
+- Updated `Keybind` setting  - Includes actions for `OnUsed` and `OnPressed` with `OnPressed` triggering only on press.
+- Updated `UtilityExmaple` - Removed the use of `_addedSettings`, added `versionOverride` section, added an `AddedSettings` section.
+- Updated `LoadMenu` function - Made public, will not open a player's settings, added `versionOverride`.
+- Updated `SendSettings` function - Added `versionOverride` to override the version of the `Menu`.
+- Updated `ReloadCurrentMenu` function - Added `versionOverride` to override the version of the `Menu`.
+- Updated `ReloadAll` function - Added `versionOverride` to override the version of the `Menu`.
+- Updated `ReloadFor` function - Added `versionOverride` to override the version of the `Menu`.
+- Updated `ReloadForAll` function - Added `versionOverride` to override the version of the `Menu`.
+- Updated `GlobalMenu` - Removed setting duplication and filtered to keybind settings only.
+- Updated `SettingIds` - If no `SettingId` is set, a random integer will be used no matter that label and setting type.
+- Removed `SetValidId` function - Removed function from all settings.
+
+## Version 0.4.5
+- Updated `Dependencies` - Updated to the latest dependencies.
+
 ## Version 0.4.4
 - Added `NuGet Package` - Can now use the NuGet package.
 

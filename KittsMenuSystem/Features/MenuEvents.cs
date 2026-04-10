@@ -60,7 +60,10 @@ internal class MenuEvents : CustomEventsHandler
                     case Slider sl when ss is SSSliderSetting ssSl: sl.OnChanged?.Invoke(hub, ssSl.SyncFloatValue, ssSl); break;
                     case ABButton yn when ss is SSTwoButtonsSetting ssYn: yn.OnChanged?.Invoke(hub, ssYn.SyncIsA, ssYn); break;
                     case TextBox pt when ss is SSPlaintextSetting ssPt: pt.OnChanged?.Invoke(hub, ssPt.SyncInputText, ssPt); break;
-                    case Keybind kb when ss is SSKeybindSetting ssKb: kb.OnUsed?.Invoke(hub, ssKb.SyncIsPressed, ssKb); break;
+                    case Keybind kb when ss is SSKeybindSetting ssKb:
+                        kb.OnUsed?.Invoke(hub, ssKb.SyncIsPressed, ssKb);
+                        if (ssKb.SyncIsPressed) kb.OnPressed?.Invoke(hub, ssKb);
+                        break;
                     default: throw new InvalidCastException($"Unhandled BaseSetting type {target.GetType().Name}");
                 }
             }
@@ -78,12 +81,10 @@ internal class MenuEvents : CustomEventsHandler
             Log.Debug("EventHandler.OnSettingReceived", e.ToString());
 
             if (KittsMenuSystem.Config.ShowErrorToClient)
-            {
                 hub.SendSettings([
                     new TextArea($"<color=red><b>{KittsMenuSystem.Config.Translation.ServerError}\n{((hub.serverRoles.RemoteAdmin || KittsMenuSystem.Config.ShowFullErrorToClient) && KittsMenuSystem.Config.ShowFullErrorToModerators ? e.ToString() : KittsMenuSystem.Config.Translation.NoPermission)}</b></color>", SSTextArea.FoldoutMode.CollapsedByDefault, KittsMenuSystem.Config.Translation.ServerError),
                     new Button(KittsMenuSystem.Config.Translation.ReloadButton.Label, KittsMenuSystem.Config.Translation.ReloadButton.ButtonText, (h, _) => h.LoadMenu(null))
                 ]);
-            }
         }
     }
 

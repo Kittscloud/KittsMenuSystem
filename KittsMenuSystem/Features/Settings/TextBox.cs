@@ -16,10 +16,10 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="onChanged">Triggers <see cref="Action"/> when <see cref="SSPlaintextSetting"/> changed.</param>
 /// <param name="placeholder"><see cref="SSPlaintextSetting.Placeholder"/> shown if content is empty.</param>
 /// <param name="characterLimit">Sets <see cref="SSPlaintextSetting.CharacterLimit"/>.</param>
-/// <param name="contentType">Type of content taken.</param>
+/// <param name="contentType">Sets <see cref="SSPlaintextSetting.ContentType"/>.</param>
 /// <param name="hint">Hint of <see cref="SSPlaintextSetting"/>.</param>
 public class TextBox(int? id, string label, Action<ReferenceHub, string, SSPlaintextSetting> onChanged = null, string placeholder = "...", int characterLimit = 64, TMP_InputField.ContentType contentType = TMP_InputField.ContentType.Standard, string hint = null)
-    : BaseSetting(new SSPlaintextSetting(SetValidId(id, label), label, placeholder, characterLimit, contentType, hint))
+    : BaseSetting(new SSPlaintextSetting(id ?? Guid.NewGuid().ToString().GetStableHashCode(), label, placeholder, characterLimit, contentType, hint))
 {
     /// <summary>
     /// Initialize new <see cref="TextBox"/> setting (automatic id) with base <see cref="SSPlaintextSetting"/> that calls <see cref="Action"/> when changed.
@@ -36,8 +36,50 @@ public class TextBox(int? id, string label, Action<ReferenceHub, string, SSPlain
     public Action<ReferenceHub, string, SSPlaintextSetting> OnChanged { get; } = onChanged;
 
     /// <summary>
-    /// Makes sure the Id is valid (not null)
+    /// Shortcut to underlying <see cref="SSPlaintextSetting.Placeholder"/>.
     /// </summary>
-    internal static int SetValidId(int? id, string label) =>
-        id ?? (label + "TextBox").GetStableHashCode();
+    public string Placeholder
+    {
+        get => (Base as SSPlaintextSetting).Placeholder;
+        set => UpdatePlaceholder(value);
+    }
+
+    /// <summary>
+    /// Shortcut to underlying <see cref="SSPlaintextSetting.SendPlaintextUpdate"/> but only for <see cref="SSPlaintextSetting.Placeholder"/>.
+    /// <see cref="SSPlaintextSetting.Placeholder"/> will go back to default (what was set in the menu) when rejoining server.
+    /// </summary>
+    public void UpdatePlaceholder(string newPlaceholder, bool applyOverride = true, Func<ReferenceHub, bool> receiveFilter = null) =>
+        (Base as SSPlaintextSetting).SendPlaintextUpdate(newPlaceholder, (ushort)CharacterLimit, ContentType, applyOverride, receiveFilter);
+
+    /// <summary>
+    /// Shortcut to underlying <see cref="SSPlaintextSetting.CharacterLimit"/>.
+    /// </summary>
+    public int CharacterLimit
+    {
+        get => (Base as SSPlaintextSetting).CharacterLimit;
+        set => UpdateCharacterLimit(value);
+    }
+
+    /// <summary>
+    /// Shortcut to underlying <see cref="SSPlaintextSetting.SendPlaintextUpdate"/> but only for <see cref="SSPlaintextSetting.CharacterLimit"/>.
+    /// <see cref="SSPlaintextSetting.CharacterLimit"/> will go back to default (what was set in the menu) when rejoining server.
+    /// </summary>
+    public void UpdateCharacterLimit(int newCharacterLimit, bool applyOverride = true, Func<ReferenceHub, bool> receiveFilter = null) =>
+        (Base as SSPlaintextSetting).SendPlaintextUpdate(Placeholder, (ushort)newCharacterLimit, ContentType, applyOverride, receiveFilter);
+
+    /// <summary>
+    /// Shortcut to underlying <see cref="SSPlaintextSetting.ContentType"/>.
+    /// </summary>
+    public TMP_InputField.ContentType ContentType
+    {
+        get => (Base as SSPlaintextSetting).ContentType;
+        set => UpdateContentType(value);
+    }
+
+    /// <summary>
+    /// Shortcut to underlying <see cref="SSPlaintextSetting.SendPlaintextUpdate"/> but only for <see cref="SSPlaintextSetting.ContentType"/>.
+    /// <see cref="SSPlaintextSetting.ContentType"/> will go back to default (what was set in the menu) when rejoining server.
+    /// </summary>
+    public void UpdateContentType(TMP_InputField.ContentType newContentType, bool applyOverride = true, Func<ReferenceHub, bool> receiveFilter = null) =>
+        (Base as SSPlaintextSetting).SendPlaintextUpdate(Placeholder, (ushort)CharacterLimit, newContentType, applyOverride, receiveFilter);
 }

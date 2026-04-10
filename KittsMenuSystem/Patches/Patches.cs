@@ -2,10 +2,10 @@
 using KittsMenuSystem.Features.Menus;
 using UserSettings.ServerSpecific;
 
-namespace KittsMenuSystem.Patchs;
+namespace KittsMenuSystem.Patches;
 
 [HarmonyPatch]
-internal static class CompatibilityPatch
+internal static class Patches
 {
     [HarmonyPatch(typeof(ServerSpecificSettingBase), nameof(ServerSpecificSettingBase.OriginalDefinition), MethodType.Getter)]
     [HarmonyPrefix]

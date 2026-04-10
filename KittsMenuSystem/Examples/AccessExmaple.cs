@@ -7,8 +7,8 @@ namespace KittsMenuSystem.Examples;
 
 internal class AccessExmaple : Menu
 {
-    // This is a menu to show the check access feature which is always false
-    // Becuase it's always false you will never actually see this menu
+    // This is a menu to show the check access feature which can also be found in the UtilityExmaple
+    // Since the CheckAccess override always returns false you will never actually see this menu (unlike the UtilityExmaple)
     // Meaning that this menu is literally pointless to put in exmaples but it's just to show
     public override List<BaseSetting> Settings(ReferenceHub hub) => [];
 

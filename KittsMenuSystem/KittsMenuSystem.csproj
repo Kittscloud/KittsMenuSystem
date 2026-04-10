@@ -23,8 +23,9 @@
 	<!-- NuGet Definitions -->
 	<PropertyGroup>
 		<Title>Kitts Menu System</Title>
+		<Description>KittsMenuSystem is a framework that adds a complete ServerSpecific menu system for SCP Secret Laboratory using LabAPI.</Description>
 		<Authors>Kittscloud</Authors>
-		<Version>0.4.4</Version>
+		<Version>0.5.0</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageReadmeFile>READMENUGET.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -34,8 +35,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\LICENSE"> <Pack>True</Pack><PackagePath>\</PackagePath> </None>
+	    <None Include="..\LICENSE"> <Pack>True</Pack><PackagePath>\</PackagePath> </None>
 		<None Include="..\READMENUGET.md"> <Pack>True</Pack><PackagePath>\</PackagePath> </None>
+		<None Include="..\README.md"> <Pack>True</Pack><PackagePath>\</PackagePath> </None>
+		<None Include="..\CHANGELOG.md"> <Pack>True</Pack><PackagePath>\</PackagePath> </None>
 	</ItemGroup>
 
     <!-- Release | x64 -->
@@ -50,18 +53,18 @@
 	
 	<!-- NuGet Packages -->
     <ItemGroup>
-      <PackageReference Include="Lib.Harmony" Version="2.4.2" />
-		<PackageReference Include="Northwood.LabAPI" Version="1.1.5" />
-		<PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
+		<PackageReference Include="Lib.Harmony" Version="2.4.2" />
+		<PackageReference Include="Northwood.LabAPI" Version="1.1.6.1" />
+		<PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
     </ItemGroup>
 
     <!-- References -->
     <ItemGroup>
-        <Reference Include="Assembly-CSharp-firstpass" HintPath="..\..\Local Admin Server\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll" />
-		<Reference Include="Assembly-CSharp" HintPath="..\..\Local Admin Server\SCPSL_Data\Managed\Assembly-CSharp-Publicized.dll" />
-		<Reference Include="Mirror" HintPath="..\..\Local Admin Server\SCPSL_Data\Managed\Mirror-Publicized.dll" />
-		<Reference Include="Unity.TextMeshPro" HintPath="..\..\Local Admin Server\SCPSL_Data\Managed\Unity.TextMeshPro.dll" />
-		<Reference Include="UnityEngine.CoreModule" HintPath="..\..\Local Admin Server\SCPSL_Data\Managed\UnityEngine.CoreModule.dll" />
+		<Reference Include="Assembly-CSharp" HintPath="..\..\$Resources\Local Admin Server\SCPSL_Data\Managed\Assembly-CSharp.dll" Publicize="true" />
+		<Reference Include="Mirror" HintPath="..\..\$Resources\Local Admin Server\SCPSL_Data\Managed\Mirror.dll" />
+		<Reference Include="Unity.TextMeshPro" HintPath="..\..\$Resources\Local Admin Server\SCPSL_Data\Managed\Unity.TextMeshPro.dll" />
+		<Reference Include="UnityEngine.CoreModule" HintPath="..\..\$Resources\Local Admin Server\SCPSL_Data\Managed\UnityEngine.CoreModule.dll" />
     </ItemGroup>
 
 </Project>
