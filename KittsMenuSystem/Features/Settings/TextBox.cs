@@ -19,7 +19,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="contentType">Sets <see cref="SSPlaintextSetting.ContentType"/>.</param>
 /// <param name="hint">Hint of <see cref="SSPlaintextSetting"/>.</param>
 public class TextBox(int? id, string label, Action<ReferenceHub, string, SSPlaintextSetting> onChanged = null, string placeholder = "...", int characterLimit = 64, TMP_InputField.ContentType contentType = TMP_InputField.ContentType.Standard, string hint = null)
-    : BaseSetting(new SSPlaintextSetting(id ?? Guid.NewGuid().ToString().GetStableHashCode(), label, placeholder, characterLimit, contentType, hint))
+    : BaseSetting(new SSPlaintextSetting(id ?? (label + nameof(TextBox)).GetStableHashCode(), label, placeholder, characterLimit, contentType, hint))
 {
     /// <summary>
     /// Initialize new <see cref="TextBox"/> setting (automatic id) with base <see cref="SSPlaintextSetting"/> that calls <see cref="Action"/> when changed.

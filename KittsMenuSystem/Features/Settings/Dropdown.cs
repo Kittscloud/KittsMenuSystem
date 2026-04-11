@@ -18,7 +18,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="entryType">Sets <see cref="SSDropdownSetting.EntryType"/>.</param>
 /// <param name="hint">Hint of <see cref="SSDropdownSetting"/>.</param>
 public class Dropdown(int? id, string label, string[] options, Action<ReferenceHub, int, SSDropdownSetting> onChanged = null, int defaultOptionIndex = 0, SSDropdownSetting.DropdownEntryType entryType = SSDropdownSetting.DropdownEntryType.Regular, string hint = null)
-    : BaseSetting(new SSDropdownSetting(id ?? Guid.NewGuid().ToString().GetStableHashCode(), label, options, defaultOptionIndex, entryType, hint))
+    : BaseSetting(new SSDropdownSetting(id ?? (label + nameof(Dropdown)).GetStableHashCode(), label, options, defaultOptionIndex, entryType, hint))
 {
     /// <summary>
     /// Initialize new <see cref="Dropdown"/> setting (automatic id) with base <see cref="SSDropdownSetting"/> that calls <see cref="Action"/> when changed.

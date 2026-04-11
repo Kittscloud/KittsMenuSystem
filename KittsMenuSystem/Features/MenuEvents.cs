@@ -31,7 +31,7 @@ internal class MenuEvents : CustomEventsHandler
         {
             Menu menu = hub.GetCurrentMenu();
 
-            BaseSetting target = menu.GetSettings(hub, false, false).FirstOrDefault(b => b.SettingId == ss.SettingId);
+            BaseSetting target = menu.GetSettings(hub).FirstOrDefault(b => b.SettingId == ss.SettingId);
 
             if (target == null)
             {

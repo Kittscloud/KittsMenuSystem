@@ -1,7 +1,6 @@
 ﻿using KittsMenuSystem.Features.Settings;
 using System.Collections.Generic;
 using System.Linq;
-using UserSettings.ServerSpecific;
 
 namespace KittsMenuSystem.Features.Menus;
 
@@ -13,8 +12,8 @@ internal class GlobalMenu : Menu
     public override List<BaseSetting> Settings(ReferenceHub hub) =>
         [.. MenuManager.RegisteredMenus
             .Where(m => m.CheckAccess(hub))
-            .SelectMany(m => m.GetSettings(hub, false, false))
-            .Where(s => s.Base is SSKeybindSetting)
+            .SelectMany(m => m.GetSettings(hub))
+            .Where(s => s is Keybind)
         ];
 
     public override string Name { get; } = "Global Menu";

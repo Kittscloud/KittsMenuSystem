@@ -20,7 +20,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="allowSpectatorTrigger">Sets <see cref="SSKeybindSetting.AllowSpectatorTrigger"/></param>
 /// <param name="hint">Hint of <see cref="SSKeybindSetting"/>.</param>
 public class Keybind(int? id, string label, Action<ReferenceHub, bool, SSKeybindSetting> onUsed = null, Action<ReferenceHub, SSKeybindSetting> onPressed = null, KeyCode suggestedKey = KeyCode.None, bool preventInteractionOnGui = true, bool allowSpectatorTrigger = true, string hint = null)
-    : BaseSetting(new SSKeybindSetting(id ?? Guid.NewGuid().ToString().GetStableHashCode(), label, suggestedKey, preventInteractionOnGui, allowSpectatorTrigger, hint))
+    : BaseSetting(new SSKeybindSetting(id ?? (label + nameof(Keybind)).GetStableHashCode(), label, suggestedKey, preventInteractionOnGui, allowSpectatorTrigger, hint))
 {
     /// <summary>
     /// Initialize new <see cref="Keybind"/> setting (automatic id).

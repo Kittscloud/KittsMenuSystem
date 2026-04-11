@@ -17,7 +17,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="holdTimeSeconds">Sets <see cref="SSButton.HoldTimeSeconds"/>.</param>
 /// <param name="hint">Hint of <see cref="SSButton"/>.</param>
 public class Button(int? id, string label, string buttonText, Action<ReferenceHub, SSButton> onPressed = null, float? holdTimeSeconds = null, string hint = null)
-    : BaseSetting(new SSButton(id ?? Guid.NewGuid().ToString().GetStableHashCode(), label, buttonText, holdTimeSeconds, hint))
+    : BaseSetting(new SSButton(id ?? (label + nameof(Button)).GetStableHashCode(), label, buttonText, holdTimeSeconds, hint))
 {
     /// <summary>
     /// Initialize new <see cref="Button"/> setting (automatic id) with base <see cref="SSButton"/> that calls <see cref="Action"/> when pressed.

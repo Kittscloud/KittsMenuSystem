@@ -82,10 +82,13 @@ public static class MenuManager
 
             IEnumerable<Menu> orderedMenus = allMenus.OrderBy(m => m.ParentMenu == null ? 0 : 1).ThenBy(m => m.Id);
 
+            int successCount = 0;
+
             foreach (Menu menu in orderedMenus)
                 try
                 {
                     menu.Register();
+                    successCount++;
                 }
                 catch (Exception e)
                 {
@@ -93,7 +96,7 @@ public static class MenuManager
                     Log.Debug("MenuManager.Register", e.ToString());
                 }
 
-            Log.Info("MenuManager.Register", $"Loaded assembly {assembly.GetName().Name}: {_registeredMenus.Count}/{allMenus.Count} menus registered");
+            Log.Info("MenuManager.Register", $"Loaded assembly {assembly.GetName().Name}: {successCount}/{allMenus.Count} menus registered");
         }
         catch (Exception e)
         {
@@ -268,7 +271,8 @@ public static class MenuManager
         foreach (BaseSetting setting in settings)
             settingsToSend.Add(setting.Base);
 
-        ServerSpecificSettingsSync.SendToPlayer(hub, [.. settingsToSend], versionOverride);
+        if (hub.isClient)
+            hub.connectionToClient.Send(new SSSEntriesPack([.. settingsToSend], versionOverride ?? ServerSpecificSettingsSync.Version));
     }
     #endregion
 

@@ -18,7 +18,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="defaultIsB">Sets <see cref="SSTwoButtonsSetting.DefaultIsB"/>.</param>
 /// <param name="hint">Hint of <see cref="SSTwoButtonsSetting"/>.</param>
 public class ABButton(int? id, string label, string optionA, string optionB, Action<ReferenceHub, bool, SSTwoButtonsSetting> onChanged = null, bool defaultIsB = false, string hint = null)
-    : BaseSetting(new SSTwoButtonsSetting(id ?? Guid.NewGuid().ToString().GetStableHashCode(), label, optionA, optionB, defaultIsB, hint))
+    : BaseSetting(new SSTwoButtonsSetting(id ?? (label + nameof(ABButton)).GetStableHashCode(), label, optionA, optionB, defaultIsB, hint))
 {
     /// <summary>
     /// Initialize new <see cref="ABButton"/> setting (automatic id) with base <see cref="SSTwoButtonsSetting"/> that calls <see cref="Action"/> when changed.

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UserSettings.ServerSpecific;
-using static UnityEngine.GraphicsBuffer;
 
 namespace KittsMenuSystem.Features.Menus;
 
@@ -127,7 +126,7 @@ public abstract class Menu
     /// <param name="callSettings">Should function call settings.</param>
     /// <param name="rebuildSettings">Should function rebuild settings.</param>
     /// <returns>List of built <see cref="BaseSetting"/>s.</returns>
-    internal List<BaseSetting> GetSettings(ReferenceHub hub, bool callSettings, bool rebuildSettings)
+    internal List<BaseSetting> GetSettings(ReferenceHub hub, bool callSettings = false, bool rebuildSettings = false)
     {
         BuiltSettings.TryGetValue(hub, out List<BaseSetting> settings);
         settings ??= BuildSettings(hub);
@@ -212,13 +211,11 @@ public abstract class Menu
         settings.AddRange(MenuManager.PinnedTopSettings.Values.SelectMany(p => p));
 
         if (ParentMenu != null)
-        {
             settings.Add(new Button(
                 string.Format(KittsMenuSystem.Config.Translation.ReturnTo.Label, MenuManager.GetMenu(ParentMenu)?.Name ?? "Unknown"),
                 KittsMenuSystem.Config.Translation.ReturnTo.ButtonText,
                 (h, _) => h.LoadMenu(ParentMenu.GetMenu())
             ));
-        }
         else if (ParentMenu == null &&
             GetType() != typeof(CentralMainMenu) &&
             GetType() != typeof(GlobalMenu) &&
@@ -247,20 +244,22 @@ public abstract class Menu
         settings.Add(new GroupHeader(Name));
         settings.AddRange(Settings(hub));
 
-        foreach (var added in AddedSettings)
+        Dictionary<int, int> indexMap = settings
+            .Select((s, i) => (s.SettingId, i))
+            .ToDictionary(x => x.SettingId, x => x.i);
+
+        foreach (AddedSetting setting in AddedSettings)
         {
-            if (added.TargetId == null)
-                settings.Add(added.Setting);
+            if (setting.TargetId == null)
+            {
+                settings.Add(setting.Setting);
+                continue;
+            }
 
-            int index = settings.FindIndex(s => s.SettingId == added.TargetId);
-
-            if (index >= 0)
-                if (added.Mode == InsertMode.After)
-                    settings.Insert(index + 1, added.Setting);
-                else
-                    settings.Insert(index, added.Setting);
+            if (indexMap.TryGetValue(setting.TargetId ?? 0, out int index))
+                settings.Insert(setting.Mode == InsertMode.After ? index + 1 : index, setting.Setting);
             else
-                settings.Add(added.Setting);
+                settings.Add(setting.Setting);
         }
 
         settings.AddRange(MenuManager.PinnedBottomSettings.Values.SelectMany(p => p));
@@ -273,8 +272,13 @@ public abstract class Menu
             if (GetType() != typeof(GlobalMenu))
                 setting.SettingId += Hash;
 
-            if (seen.ContainsKey(setting.SettingId))
-                continue;
+            int originalId = setting.SettingId;
+
+            while (seen.ContainsKey(setting.SettingId))
+                setting.SettingId++;
+
+            if (originalId != setting.SettingId)
+                Log.Debug("Menu.GenerateSettings", $"Adjusted ID in '{Name}' -> {setting.GetType().Name} '{setting.Label}' {originalId} -> {setting.SettingId}");
 
             seen[setting.SettingId] = setting;
             final.Add(setting);

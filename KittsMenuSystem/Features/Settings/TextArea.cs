@@ -1,5 +1,4 @@
 using Mirror;
-using System;
 using TMPro;
 using UserSettings.ServerSpecific;
 
@@ -17,7 +16,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="collapsedText">Text in <see cref="SSTextArea"/> when collapsed.</param>
 /// <param name="textAlignment">Alignment of text.</param>
 public class TextArea(int? id, string content, SSTextArea.FoldoutMode foldoutMode = SSTextArea.FoldoutMode.NotCollapsable, string collapsedText = null, TextAlignmentOptions textAlignment = TextAlignmentOptions.TopLeft)
-    : BaseSetting(new SSTextArea(id ?? Guid.NewGuid().ToString().GetStableHashCode(), content, foldoutMode, collapsedText, textAlignment))
+    : BaseSetting(new SSTextArea(id ?? (content + nameof(TextArea)).GetStableHashCode(), content, foldoutMode, collapsedText, textAlignment))
 {
     /// <summary>
     /// Initialize new <see cref="TextArea"/> setting (automatic id) with base <see cref="SSTextArea"/>.

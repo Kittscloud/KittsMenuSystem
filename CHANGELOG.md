@@ -1,5 +1,10 @@
 # KittsMenuSystem Changelog
 
+## Version 0.5.1
+- Fixed `Keybinds` - Fixed a bug where keybinds would be reset when reloading a menu.
+- Fixed `Dedicated Server` - Fixed a bug where the dedicated server player would recieve menus.
+- Updated `SettingIds` - If no `SettingId` is set one will be made based on the label and setting type, any duplicate ids will be incremented by 1.
+
 ## Version 0.5.0
 - Added `ABButton.OptionA` - Get or set the underlying `SSTwoButtonsSetting.OptionA`.
 - Added `ABButton.OptionB` - Get or set the underlying `SSTwoButtonsSetting.OptionB`.

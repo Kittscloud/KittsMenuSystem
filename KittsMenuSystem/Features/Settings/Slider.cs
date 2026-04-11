@@ -21,7 +21,7 @@ namespace KittsMenuSystem.Features.Settings;
 /// <param name="finalDisplayFormat">Sets <see cref="SSSliderSetting.FinalDisplayFormat"/>..</param>
 /// <param name="hint">Hint of <see cref="SSSliderSetting"/>.</param>
 public class Slider(int? id, string label, float minValue, float maxValue, Action<ReferenceHub, float, SSSliderSetting> onChanged = null, float defaultValue = 0, bool integer = false, string valueToStringFormat = "0.##", string finalDisplayFormat = "{0}", string hint = null)
-    : BaseSetting(new SSSliderSetting(id ?? Guid.NewGuid().ToString().GetStableHashCode(), label, minValue, maxValue, defaultValue, integer, valueToStringFormat, finalDisplayFormat, hint))
+    : BaseSetting(new SSSliderSetting(id ?? (label + nameof(Slider)).GetStableHashCode(), label, minValue, maxValue, defaultValue, integer, valueToStringFormat, finalDisplayFormat, hint))
 {
     /// <summary>
     /// Initialize new <see cref="Slider"/> setting (automatic id) with base <see cref="SSSliderSetting"/> that calls <see cref="Action"/> when changed.
