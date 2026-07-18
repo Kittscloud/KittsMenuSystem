@@ -25,7 +25,7 @@
 		<Title>Kitts Menu System</Title>
 		<Description>KittsMenuSystem is a framework that adds a complete ServerSpecific menu system for SCP Secret Laboratory using LabAPI.</Description>
 		<Authors>Kittscloud</Authors>
-		<Version>0.5.1</Version>
+		<Version>0.5.2</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageReadmeFile>READMENUGET.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -55,8 +55,8 @@
     <ItemGroup>
 		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
 		<PackageReference Include="Lib.Harmony" Version="2.4.2" />
-		<PackageReference Include="Northwood.LabAPI" Version="1.1.6.1" />
-		<PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
+		<PackageReference Include="Northwood.LabAPI" Version="1.1.7" />
+		<PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
     </ItemGroup>
 
     <!-- References -->

@@ -5,12 +5,6 @@ namespace KittsMenuSystem;
 public class Config
 {
     /// <summary>
-    /// Is plugin enabled.
-    /// </summary>
-    [Description("Is plugin enabled")]
-    public bool IsEnabled { get; set; } = true;
-
-    /// <summary>
     /// Sends debug logs to console.
     /// </summary>
     [Description("Sends debug logs to console")]

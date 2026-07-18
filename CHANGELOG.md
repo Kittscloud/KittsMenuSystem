@@ -1,5 +1,9 @@
 # KittsMenuSystem Changelog
 
+## Version 0.5.2
+- Updated `Dependencies` - Updated to the latest dependencies.
+- Removed `IsEnabled` - Removed the `IsEnabled` field from the config.
+
 ## Version 0.5.1
 - Fixed `Keybinds` - Fixed a bug where keybinds would be reset when reloading a menu.
 - Fixed `Dedicated Server` - Fixed a bug where the dedicated server player would recieve menus.

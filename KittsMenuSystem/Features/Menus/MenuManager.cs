@@ -294,7 +294,7 @@ public static class MenuManager
             Type t = typeof(T);
 
             if (typeof(BaseSetting).IsAssignableFrom(t))
-            {   
+            {
                 if (t == typeof(Button)) return (T)(object)new Button(int.MinValue, "", "");
                 if (t == typeof(Dropdown)) return (T)(object)new Dropdown(int.MinValue, "", []);
                 if (t == typeof(Slider)) return (T)(object)new Slider(int.MinValue, "", 0, 1);
@@ -416,7 +416,8 @@ public static class MenuManager
     /// Reload current <see cref="Menu"/> for all <see cref="ReferenceHub"/>s.
     /// </summary>
     /// <param name="versionOverride">Version of the menu.</param>
-    public static void ReloadAll(int? versionOverride = null) { 
+    public static void ReloadAll(int? versionOverride = null)
+    {
         foreach (ReferenceHub hub in ReferenceHub.AllHubs.Where(h => h.isClient))
             hub.ReloadCurrentMenu(versionOverride);
     }

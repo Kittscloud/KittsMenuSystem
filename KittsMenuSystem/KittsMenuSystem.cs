@@ -20,7 +20,7 @@ public class KittsMenuSystem : Plugin
     public override string Description { get; } = "";
     public override LoadPriority Priority { get; } = LoadPriority.Lowest;
 
-    public override Version Version { get; } = new Version(0, 5, 1);
+    public override Version Version { get; } = new Version(0, 5, 2);
     public override Version RequiredApiVersion { get; } = new Version(LabApiProperties.CompiledVersion);
 
     public static Config Config { get; set; }
@@ -35,9 +35,6 @@ public class KittsMenuSystem : Plugin
 
         if (_errorLoadingConfig)
             Log.Error("There was an error loading the config files, please check them or generate new ones");
-
-        if (!Config.IsEnabled)
-            return;
 
         MenuManager.RegisterAllMenus();
 

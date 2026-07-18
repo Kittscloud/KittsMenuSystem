@@ -32,7 +32,7 @@ public abstract class BaseSetting(ServerSpecificSettingBase @base)
     /// Shortcut to underlying <see cref="ServerSpecificSettingBase.SendLabelUpdate"/>.
     /// <see cref="ServerSpecificSettingBase.Label"/> will go back to default (what was set in the menu) when rejoining server.
     /// </summary>
-    public void UpdateLabel(string newLabel, bool applyOverride = true, Func<ReferenceHub, bool> receiveFilter = null) => 
+    public void UpdateLabel(string newLabel, bool applyOverride = true, Func<ReferenceHub, bool> receiveFilter = null) =>
         Base.SendLabelUpdate(newLabel, applyOverride, receiveFilter);
 
     /// <summary>
