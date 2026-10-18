@@ -1,40 +1,34 @@
 # KittsMenuSystem
 *LabAPI Server-Specific Menu Framework*
 
-[![License](https://img.shields.io/badge/License-AGPL%20v3.0-blue?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/blob/main/LICENSE)
-[![Downloads](https://img.shields.io/github/downloads/Kittscloud/KittsMenuSystem/total?style=for-the-badge)](https://github.com/Kittscloud/ServerSpecificsSyncer/releases/latest)
-[![GitHub release](https://img.shields.io/github/v/release/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/releases/latest)
-[![](https://img.shields.io/badge/.NET-4.8.1-512BD4?logo=dotnet&logoColor=fff&style=for-the-badge)](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net481)
-[![GitHub stars](https://img.shields.io/github/stars/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/issues)
+[![License](https://img.shields.io/badge/License-AGPL%20v3.0-blue?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/blob/main/LICENSE) [![Downloads](https://img.shields.io/github/downloads/Kittscloud/KittsMenuSystem/total?style=for-the-badge)](https://github.com/Kittscloud/ServerSpecificsSyncer/releases/latest) [![GitHub release](https://img.shields.io/github/v/release/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/releases/latest) [![](https://img.shields.io/badge/.NET-4.8.1-512BD4?logo=dotnet&logoColor=fff&style=for-the-badge)](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net481) [![GitHub stars](https://img.shields.io/github/stars/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/stargazers) [![GitHub issues](https://img.shields.io/github/issues/Kittscloud/KittsMenuSystem?style=for-the-badge)](https://github.com/Kittscloud/KittsMenuSystem/issues)
 
 `KittsMenuSystem` is a framework that adds a complete ServerSpecific menu system for `SCP Secret Laboratory` using `LabAPI`.
 
 ## Important
-`KittsMenuSystem` is mostly based on another menu framework called [`SSMenuSystem`](https://github.com/skyfr0676/SSMenuSystem), which has been discontinued. Since the original framework was discontinued, I have taken it over, updating it to the latest versions and improving the plugin overall.
+`KittsMenuSystem` is mostly based on another menu framework called [`SSMenuSystem`](https://github.com/skyfr0676/SSMenuSystem), which has been discontinued. Since the original framework was discontinued, I thought I would pick it up and continue it, updating it to the latest versions and improving the plugin.
 
-That being said, the original plugin developer, [`skyfr0676`](https://github.com/skyfr0676), created a fantastic plugin, and I am personally very grateful that this project existed in the first place.
+That being said, the original plugin developer, [`skyfr0676`](https://github.com/skyfr0676), created a fantastic plugin, and I am personally very grateful that this project exists in the first place.
 
 ## Consider Supporting?
 If you enjoy this project and would like to support future development, I would greatly appreciate it if you considered donating via my [`Ko-Fi`](https://ko-fi.com/kittscloud).
 
-## How to use KittsMenuSystem:
-To install `KittsMenuSystem` on your server, you will need:
-- `Harmony` `v2.4.2` or later.
-- `KittsMenuSystem` latest version.
+## Installation
+All required files can be found in the [`latest release`](https://github.com/Kittscloud/KittsMenuSystem/releases/latest).
 
-All of these files can be found in the [`latest release`](https://github.com/Kittscloud/KittsMenuSystem/releases/latest).
+**Required files**
+- `KittsMenuSystem.dll` (latest version)
+- `Harmony.dll` (`v2.4.3` or later)
 
-Once you have these:
-- Place `Harmony.dll` in the `dependencies` folder.
-- Place `KittsMenuSystem.dll` in the `plugins` folder.
+**Installation**
+- Place `KittsMenuSystem.dll` in your `plugins` folder.
+- Place `Harmony.dll` in your `dependencies` folder.
 
 Run the server and you're set!
 
 ### Configurations:
 | Parameter                    | Type          | Description                                                           | Default Value |
 |------------------------------|---------------|-----------------------------------------------------------------------|---------------|
-| `IsEnabled`                  | `bool`        | Is plugin enabled.                                                    | `true`        |
 | `Debug`                      | `bool`        | Sends debug logs to console.                                          | `false`       |
 | `ShowErrorToClient`          | `bool`        | Whether players can see errors or not.                                | `true`        |
 | `ShowFullErrorToClient`      | `bool`        | Whether players can see total errors (plugin content) or not.         | `false`       |
@@ -54,8 +48,6 @@ Run the server and you're set!
 
 ### Default YML Config File:
 ```yml
-# Is plugin enabled
-is_enabled: true
 # Sends debug logs to console
 debug: false
 # Whether players can see errors or not
@@ -94,6 +86,9 @@ translation:
 
 ### Want to use in your own project?
 To install in your project, simply reference the `KittsMenuSystem.dll` file, found in the [`latest release`](https://github.com/Kittscloud/KittsMenuSystem/releases/latest).
+
+Alternatively, you can use the `NuGet Package` which can be found here:
+- [`KittsMenuSystem`](https://www.nuget.org/packages/KittsMenuSystem)
 
 Create a new class inheriting the `Menu` class.
 

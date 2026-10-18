@@ -1,5 +1,8 @@
 # KittsMenuSystem Changelog
 
+## Version 0.5.3
+- Updated `Dependencies` - Updated to the latest dependencies.
+
 ## Version 0.5.2
 - Updated `Dependencies` - Updated to the latest dependencies.
 - Removed `IsEnabled` - Removed the `IsEnabled` field from the config.

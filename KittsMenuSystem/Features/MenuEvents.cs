@@ -64,7 +64,9 @@ internal class MenuEvents : CustomEventsHandler
                         kb.OnUsed?.Invoke(hub, ssKb.SyncIsPressed, ssKb);
                         if (ssKb.SyncIsPressed) kb.OnPressed?.Invoke(hub, ssKb);
                         break;
-                    default: throw new InvalidCastException($"Unhandled BaseSetting type {target.GetType().Name}");
+                    default:
+                        Log.Error("EventHandler.OnSettingReceived", $"Unhandled BaseSetting type {target.GetType().Name}");
+                        break;
                 }
             }
             finally
@@ -93,11 +95,11 @@ internal class MenuEvents : CustomEventsHandler
         if (original == null)
             return;
 
-        // base fields
+        // Base fields
         target.Label = original.Label;
         target.HintDescription = original.HintDescription;
 
-        // type specific restore
+        // Type specific restore
         switch (target)
         {
             case SSButton btn when original is SSButton ob:

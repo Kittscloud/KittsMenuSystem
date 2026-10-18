@@ -25,9 +25,9 @@
 		<Title>Kitts Menu System</Title>
 		<Description>KittsMenuSystem is a framework that adds a complete ServerSpecific menu system for SCP Secret Laboratory using LabAPI.</Description>
 		<Authors>Kittscloud</Authors>
-		<Version>0.5.2</Version>
+		<Version>0.5.3</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<PackageReadmeFile>READMENUGET.md</PackageReadmeFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageTags>menu-system;server-settings;server-configuration;custom-settings;game-server;SCP-SL;plugin;server-management;admin-tools;configuration;server-specific-settings;player-settings;gameplay-settings;plugin-framework;settings-menu;server-customization</PackageTags>
 		<RepositoryUrl>https://github.com/Kittscloud/KittsMenuSystem</RepositoryUrl>
@@ -36,7 +36,6 @@
 
 	<ItemGroup>
 	    <None Include="..\LICENSE"> <Pack>True</Pack><PackagePath>\</PackagePath> </None>
-		<None Include="..\READMENUGET.md"> <Pack>True</Pack><PackagePath>\</PackagePath> </None>
 		<None Include="..\README.md"> <Pack>True</Pack><PackagePath>\</PackagePath> </None>
 		<None Include="..\CHANGELOG.md"> <Pack>True</Pack><PackagePath>\</PackagePath> </None>
 	</ItemGroup>
@@ -54,7 +53,7 @@
 	<!-- NuGet Packages -->
     <ItemGroup>
 		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
-		<PackageReference Include="Lib.Harmony" Version="2.4.2" />
+		<PackageReference Include="Lib.Harmony" Version="2.4.3" />
 		<PackageReference Include="Northwood.LabAPI" Version="1.1.7" />
 		<PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
     </ItemGroup>
